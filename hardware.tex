@@ -1,0 +1,51 @@
+\chapter{Hardware Overview}
+
+%\section{Theory of Operation} 
+
+%We begin this section with an overview of the equipment (i.e. the WAM and BarrettHand) followed by a brief look at how this equipment is monitored and controlled throughout the experiments.
+
+\section{Whole Arm Manipulator (WAM)} 
+
+The WAM is a 7 degree-of-freedom (DOF) robotic arm and wrist system from Barrett.
+There are three input types when controlling the WAM: (1) joint position, (2) joint torque, and (3) Cartesian position.
+All inputs are automatically translated into joint torques and fed to puck motors in the arm [40].
+The simplest control input is Cartesian (X, Y, Z) however it does not guarantee exact positioning within the robot’s Cartesian workspace (approximated as a 2-meter diameter sphere), nor does this control scheme support any kind of collision avoidance.
+In contrast, joint-space input offers complete and accurate control over all DOFs of the arm.
+
+The WAM is PID-controlled in realtime mode whereas all other function is non-realtime.
+This poses some restrictions on controller execution.
+For example, output to the console during realtime operation is forbidden and forces the control program to halt.
+The WAM comes with built-in gravity compensation mode, which, when active, adds a high level of compliance to the arm.
+
+See Figure 3.2 for the WAM’s joint angle and velocity/acceleration limits and Figure 3.3 for further specifications.
+
+\section{Force/Torque Sensor} 
+
+The Barrett 6-Axis Force/Torque Sensor expands the force sensing capability of the WAM and BarrettHand systems.
+The Force/Torque sensor processes signals from all the strain gages and outputs three forces and three torques within the Cartesian workspace of the WAM.
+Full specifications are presented in Figure 3.5.
+
+\section{BarrettHand} 
+
+The BarrettHand is a 4 DOF, under-actuated, threefingered robotic hand from Barrett.
+The DOFs are the joint positions at the base of each finger, and the spread of the first and second fingers around the circumference of the wrist.
+See Figure 3.7 for details. 
+The hand’s underactuation is possible via the TorqueSwitch technology, which is presented in Figure 3.6.
+The hand is controlled in four fashions: (1) joint-torques; (2) joint-velocitie; (3)
+joint-positions; and (4) high-level commands.
+Jointposition commands are executed with a trapezoidal motion profile meaning that accelerations change instantaneously at the point the command is given.
+High-level commands include commanding any or all fingers to open or close.
+As with the WAM, all commands are eventually translated to joint-torques by the associated puck motors in the hand [41].
+Apart from standard joint-encoders, the BarrettHand has optional sensors, which include tactile and strain-gage sensors.
+
+\subsection{Tactile Sensors} 
+
+Tactile sensors onboard the BarrettHand localize pressure across the palm and fingers.
+They are arranged as four sets of cell arrays; one set within the distal segment of each finger as well as one set in the palm.
+There are 96 cells in total (24 in each set).
+See Figure 3.11 for full tactile sensor specifications.
+
+\subsection{Strain-gage Sensors} 
+
+Strain in the hand is measured as torques experienced about the distal joints of each of the hand’s fingers over a range of +/- 1 N-m.
+Strain-gages measure the differential tension in the tendon-like structure running through each finger to the second joint.See Figure 3.8 for a schematic drawing of the joint-torque sensor system of the hand.

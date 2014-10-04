@@ -1,0 +1,81 @@
+\chapter{Conclusions and Future Work}
+\label{chap6}
+%\section{Future Directions}
+
+In the thesis, I present the challenge of predicting properties of real-world environments using high-dimensional haptic sensory data from the perspectives of both biological and robotic systems.
+
+\section{Summary}
+
+I begin in Chapter~\ref{chap2} by presenting insights into the problem from the established robotics, neuroscience and physiology literature. 
+Next, I define the prediction problem more formally in Chapter~\ref{chap3}.
+In Chapter~\ref{chap4} I provide an overview on the software framework used to control the physical WAM/Hand system and collect data in support of experiments.
+I then introduce a model-free approach to the prediction of example environment properties -- namely object mass, friction, and compliance -- during the course of a non- prehensile topple-slide manipulation task in Chapter~\ref{chap5}.
+
+Given appropriate data from example manipulations with known environment properties, the method  presented in the thesis extracts information from unlabeled sensory data collected over the course of a new manipulation. 
+I demonstrate that our novel metric, known as the Task Variance Ratio (TVR), identifies important features, sensors and motion-phases. 
+Using the TVR metric combined with the PLS regression method, we obtain accurate predictions in real-time using only 3\% of the sensory input data from the robot. 
+
+\section{Limitations and Future Directions}
+% limitations and future work: prescribed motion, fixed timing, kinematic and dynamic generalization
+
+One significant limitation of the predictive framework is the need for a prescribed motion that can already succeed at the task despite variations in the environment properties that I seek to predict.
+%A related issue is the need for the motion to run in open-loop and is not sensitive to any kind of obstruction, as may be encountered in dynamic environments.
+
+An important direction for future work will be to investigate the tight integration of prediction and adaptation into the framework.  
+With knowledge (learned or provided) of how to adapt the topple-slide task for heavier or more compliant blocks, this could readily be used to enlarge the range of variations that can be coped with. 
+
+\subsection*{Surprise-and-adapt}
+I have devised a preliminary model-based motion adaptation approach to succeed in environments where the prescribed motion fails.
+Under the assumption that the robot has access to tactile pressure and/or fingertip torque sensors, I modify the orientation of the robot's wrist about the axis parallel to the manipulated block, so that the pressure readings at the fingertips track an appropriate profile provided by an expert.
+
+To deal with sensor noise, I consider a history of sensor readings of size $K_r$.
+If sensor readings fall below a threshold for at least $K_r$ timesteps, the orientation of the wrist increases -- thus applying more pressure to the block.
+Similarly, if sensors consistently read above a threshold, the orientation of the wrist decreases -- releasing pressure.
+See Program~\ref{pgm:saa} for a pseudocode of this operation.
+
+This scheme is successful for the topple-slide task when particularly small perturbations in the environment are experienced, such as a relatively small (within two units) change in object mass, but fails with large perturbations.%, such as if the block is removed completely from the workspace.
+
+An interesting future direction is to devise a model-free approach in which the robot discovers for itself that a lack of pressure at its fingertips means that its wrist orientation should increase (in addition to other relevant mappings between sensor readings and adaptive motions).
+This knowledge would have to come from the data and would most likely require additional sensors and/or some form of supervision, e.g. from a human or a camera.
+
+\begin{Program}[width=0.5\linewidth]
+\center
+\begin{verbatim}
+void operate()  //repeat at 500Hz
+{   //Consider a history of thresholded differences.
+    if ( sensor_value - expected_value > threshold_p )
+        history.append_front ( 1 )
+    else if ( sensor_value - expected_value < threshold_n )
+        history.append_front ( -1 )
+    else
+        history.append_front ( 0 )
+    //'Surprise' iff at least K contiguous unexpected readings.
+    if ( sum ( history [ 0 : K ] ) == K )   //too much pressure
+        decrease_wrist_angle()
+    if ( sum ( history [ 0 : K ] ) == -K )  //too little pressure
+        increase_wrist_angle()
+}
+\end{verbatim}
+%signal ( ADAPT )    // adapts to new environment
+%if ( surprise_and_adapt )       // OR 
+%if ( surprise_and_stop )
+%    signal ( STOP )     // robot stops operation
+  \caption{Realtime \emph{operate} method pseudocode for the surprise-and-adapt realtime system module. See Section~\ref{sec:realtime_eg} for general details on Libbarrett realtime systems development.}
+  \label{pgm:saa}
+\end{Program}
+
+
+\subsection*{Time-synchronized motions}
+
+A related limitation is that our current sensory features are all time-indexed, i.e., there is an assumption that the current phase of the motion is tightly coupled to the current time.  In future work, I would like to couple the phase estimate more tightly to the actual motion via available sensory observations.
+
+\subsection*{Task-parameter generalization}
+
+A last key limitation is that because of the model-free nature of the current approach, the prediction procedures do not generalize well to changes in the task kinematics or dynamics. 
+I aim to develop parameterized versions of the predictive model in order to allow for such generalization.
+
+\subsection*{Leveraging physics-based simulation}
+
+I am are also interested in exploring how simulations with only qualitative accuracy might be used to identify suitable sensors and motion phases in advance. This could be used to inform the types of sensors and their placement, as well as provide insight with respect to relevant time-steps at which to record data.  Initial results in this direction are promising and thus point to a new use for simulations that are not necessarily tightly calibrated to the true kinematics and dynamics of the plant.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%

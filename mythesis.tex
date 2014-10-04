@@ -1,0 +1,108 @@
+\NeedsTeXFormat{LaTeX2e}[1995/12/01]
+\ProvidesFile{ubcsample.tex}[2012/04/07 v1.70 ^^J
+ University of British Columbia Thesis]
+\documentclass[msc,oneside]{ubcthesis}
+
+% \afterpage{\clearpage} right after a figure.  
+\usepackage{afterpage}
+\usepackage{float}
+\usepackage{longtable} % to define tables that span multiple pages.
+\usepackage{pdflscape} % allows for landscape format pages
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{psfrag}
+\usepackage{graphicx} % for pdf, bitmapped graphics files
+\usepackage{amsmath} % assumes amsmath package installed
+\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{multirow}
+%\usepackage{subfigure} % include multiple figures and captions within a single figure environment.
+%\usepackage{here}
+%\usepackage[subfigure, titles]{tocloft} % This allows you to use math in graph labels
+%\usepackage{alltt} % This is useful for including source code from an additional file.
+%\usepackage{listings} % has facilities for pretty-printing many languages.
+
+\usepackage[unicode=true,
+  linktocpage,
+  linkbordercolor={0.5 0.5 1},
+  citebordercolor={0.5 1 0.5},
+  linkcolor=blue]{hyperref}
+%\newcommand\url[1]{\texttt{#1}} % put the URL's in a typewriter font but not link them (comment hyperref first)
+
+\usepackage{setspace}
+%\singlespacing
+\onehalfspacing
+%\doublespacing
+
+\newfloat{Program}{h}{lop}
+
+\institution{The University Of British Columbia}
+\faculty{The Faculty of Graduate Studies}
+\program{Computer Science}
+\institutionaddress{Vancouver}
+\previousdegree{B.CS. Hons. Co-op, The University of Manitoba, 2011}
+\title{Mapping Environment Properties to Sensory Inputs for Robotic Manipulation}
+\author{Daniel Michael Troniak}
+\copyrightyear{2013}
+\submitdate{\monthname\ \number\year} % The "\ " is required 
+
+\renewcommand\thechapter      {\arabic{chapter}}
+\renewcommand\thesection      {\thechapter.\arabic{section}}
+\renewcommand\thesubsection   {\thesection.\arabic{subsection}}
+\renewcommand\thesubsubsection{\thesubsection.\arabic{subsubsection}}
+\renewcommand\theparagraph    {\thesubsubsection.\arabic{paragraph}}
+\renewcommand\thesubparagraph {\theparagraph.\arabic{subparagraph}}
+
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{2}
+
+\begin{document}
+
+\frontmatter
+\maketitle                      %% Mandatory
+
+\begin{abstract}                %% Mandatory -  maximum 350 words
+For one to manipulate an object, one must first make judgments about the object such as its mass, shape, size, and function. For example, if I were to pick up an object which was heavier than predicted, such as an overweight suitcase, I would need to detect this fact and adapt my lifting strategy. Thus, to successfully program a robot to perform manipulation tasks, it becomes useful to first equip it with the means to perceive its environment. 
+
+Sensors have been developed that take various measurements such as the amount of force applied to a manipulator or amount of pressure applied to a surface. Gaining abstract understanding of an environment, for example that a suitcase is heavy and its handle is slippery, typically requires combinations of sensor readings to predict accurately. As more sensors are added to the system, however, a cost increase to transmitting and subsequently processing the resulting data is experienced.
+
+In this thesis, I first present existing ways in which touch sensors are used and processed to gain abstract understanding of environments. I then review neuroscience and physiology literature on the current understanding of how the human motor system processes and acts on sensor data. I then present our novel approach to predicting properties of an environment in real-time using a large number of touch sensors, such as force, torque and tactile feedback, mounted to a Barrett WAM robot with attached BarrettHand as the robot performs a prescribed manipulation.
+
+I introduce a novel metric that quantifies the usefulness of any given sensor reading to predicting properties of an environment relevant to the manipulation, including the mass and stiffness of a manipulated block as well as the coefficient of static friction between the block and the table surface. Real-time environment property predictions are made possible by selecting just the top 5\% of sensor readings according to this metric. A 6.14\% decrease to the mean percentage error in the predicted properties is also achieved compared to making predictions based on all available sensor readings.
+\end{abstract}
+
+\input{preface}
+
+\tableofcontents                %% Mandatory
+\listoftables                   %% Mandatory if thesis has tables
+\listoffigures                  %% Mandatory if thesis has figures
+%% Any other lists should come here, i.e. definitions, glossary, list of symbols etc.
+
+\input{acknowledgements}
+
+\chapter[Dedication]{} %% Optional
+Dedicated to my wife Jill and daughter Jade.
+
+\mainmatter % Now regular page numbering begins.
+
+\input{1chapter1}
+\input{2chapter2}
+\input{3chapter3}
+\input{4chapter4}
+\input{5chapter5}
+\input{6chapter6}
+%\input{report}
+
+\bibliographystyle{plain}
+\bibliography{allbibs}
+
+\appendix
+%\input{software}
+\input{hardware}
+
+\backmatter
+
+%% Indices come here if you have them.
+
+\end{document}
+\endinput

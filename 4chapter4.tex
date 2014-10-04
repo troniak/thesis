@@ -1,0 +1,123 @@
+\chapter{Control Software}
+\label{chap4}
+
+In this chapter, we provide an overview of the software deployed to control the motion of the robot and collect sensor readings in support of experiments.
+
+%\section{Usage}
+%\section{Maintenance}
+
+\section{Libbarrett API} 
+
+The API used to communicate with the robot is called Libbarrett: a C++ library from Barrett Technology Inc. \cite{libbarrett}.
+This library provides abstract control of the WAM and BarrettHand and allows them to be controlled in tandem.
+Sample programs that perform simple control and sensor monitoring routines are provided, upon which our controller in the current study is based.
+
+Libbarrett provides three high-level constructs to interface with the robot: (1) the WAM object (2) the Hand object and (3) the ProductManager.
+The WAM and Hand objects provide high-level control of the WAM and attached BarrettHand respectively.
+The ProductManager provides access to the WAM’s optional components, such as attached tools (e.g.  BarrettHand) and Force/Torque sensor.
+The control software communicates with the Hand and WAM through high-level function calls to their respective libbarrett objects using a variety of pre-defined data structures. 
+These datastructures are presented in Table~\ref{tbl:data_types}.
+%Data types for interfacing with the WAM and BarrettHand are presented in Table~\ref{tbl:data_types}.
+
+\begin{table}[h]
+\begin{tabular}{| c | c | c |}
+    \hline
+    Name & Type & Unit \\
+    \hline 
+    Cartesian Position & cp\_type & Meters\\
+    Joint Position & jp\_type & Radians\\
+    Joint Velocity & jv\_type & Radians/s\\
+    Joint Torque & jt\_type & Radians/s \\
+    \hline 
+\end{tabular}
+\caption{Libbarrett data-types when communicating with the robot. The jp\_type for the WAM is a seven-dimensional vector whereas for the BarrettHand, it is a four-dimensional vector -- one entry for each finger and one for the spread.}
+\label{tbl:data_types}
+\end{table}
+
+
+\section{WAM Control}
+
+\paragraph{Cartesian-space}
+Control in Cartesian space is a convenient way to prototype motions and is sufficiently repeatable for tasks which require low accuracy.
+Accuracy of the Cartesian positioning of the WAM is advertised at two millimeters.
+In practise, however, this accuracy depends largely on the joint-angle configuration of the WAM at the beginning of the Cartesian-space move.
+In my experiments, position error can easily accumulate to reach as high as one centimeter, depending on the joint-angle position of the robot at the beginning of the Cartesian-space move.
+These high errors may be due to imperfect inverse-kinematics currently available through the Libbarrett API.
+%Hand-tuned motions are more easily accomplished in Cartesian space when a specific motion within is desired and is effective only if the level of accuracy required is relatively low (0.5~1 cm).
+Cartesian trajectories were not sufficiently repeatable in our experiments since we required a precise and highly repeatable motion (accurate to within 1 mm) to perform our task across various environments.
+Moreover, the workspace accessible by rotating the wrist is limited by the angular configuration of its attaching joint. 
+This means that certain wrist orientations are not repeatable if the inverse-kinematics solution provides differing joint-space positioning around the wrist.
+These drawbacks prevent us from commanding the robot in Cartesian-space in our experiments.
+%which is a limitation we have encountered in our experiments.
+%Since motion of the robot is desired within a specific area of the workspace, the simplest and most straightforward 
+
+\paragraph{Joint-space}
+For accurate and repeatable sets of motions, the robot should be controlled directly in joint-space.
+%This is problematic when developing motions by hand since specific Cartesian-space trajectories are extremely difficult to match via specific hand-tuned joint-angle trajectories.
+The only issue with joint-space control is that the robot performs its task in Cartesian-space. 
+Joint-angle trajectories that accomplish specific Cartesian-space tasks are difficult if not impossible to define manually.
+This necessitates kinesthetic teaching where the robot is trained to perform its task in Cartesian space by a human expert manually moving the robot tool to perform a task, while corresponding joint-space trajectories are recorded by the robot.
+
+\paragraph{Kinesthetic Teach-and-Play}
+The Libbarrett API comes equipped with kinesthetic teaching functionality via the teach-and-play module.
+Teach-and-play records position information at the rate of 500Hz while a user physically moves the robot through the desired motions.
+The robot can record its trajectory in either Cartesian-space or joint-space.
+Again, due to imperfect inverse-kinematics, if a highly repeatable motion is required it is advisable to record trajectories in joint-space.
+It becomes possible to execute highly repeatable Cartesian-space trajectories if the relative displacement from a known starting joint-angle position is small (i.e. a workspace of approximately $10cm^3$ around a starting joint-angle position).
+
+\section{Barrett-Hand Control}
+
+In this section, we introduce the details on control of the BH8-280 Barrett-Hand through the Libbarrett API, as used in our experiments.
+
+\paragraph{Velocity Move}
+The simplest form of control of each finger of the Hand is to specify a direction and rate of travel of each of the joints in the Hand.
+The joints will halt gracefully if they reach their limits or become obstructed before they reach these limits.
+
+\paragraph{Trapezoidal Position Move}
+If the Hand must be configured precisely (for e.g a pre-grasp posture), the user can specify desired joint-angles of each finger and spread.
+The spread of the Hand refers to the single degree of freedom rotation of the first and third fingers about the palm.
+Upon sending position commands the hand, the proximal finger joint angles or the angle of spread move toward the goal position via a trapezoidal velocity profile.
+As with velocity control, the fingers will halt gracefully if the movement of the hand becomes obstructed.
+
+\paragraph{High Control-rate Position Move}
+High control-rate position moves provide an advanced alternative to simple trapezoidal moves.
+Joint-angles can be specified to reach a desired pose, however each of the joints travel at maximum velocity until they reach the desired pose or become obstructed.
+Care must be taken when sending these commands, as obstructions do not result in graceful halts and instead could cause damage to objects or the Hand itself.
+It is necessary to ensure a clear path for each of the fingers and spread of the Hand before sending these commands.
+
+\section{Realtime Systems}
+\label{sec:realtime_eg}
+Control of the robot in realtime must be done through the Libbarrett realtime systems library.
+Realtime control allows for complex and closed-loop motions since the output of each realtime system depends upon its inputs at each step of the realtime control loop at the rate of 500Hz.
+Program~\ref{pgm:rtsys} provides an example program which defines such a realtime system in the C++ programming language.
+
+\begin{Program}[width=0.5\pagewidth]
+\center
+\begin{verbatim}
+class WamSystem : public System {
+public:     Input<jp_type> input;       // Obtain current joint-angles as input
+public:     Output<jp_type> output;     // Provide updated joint-angles as output
+protected:  Value* outputValue;         // Value that output reads
+protected:  jp_type jp_offsets;         // Modifications to realtime motion feed
+public:
+    WamSystem(const string& sysName):   // All systems must define a name
+        System(sysName), input(this), output(this, &outputValue){ 
+            init_vec(&jp_offsets, 0);   // Initialize all offsets to 0
+        }
+    ~WamSystem(){ mandatoryCleanUp(); } // Mandatory destructor 
+protected:
+    jp_type jp_out;                     // Declare local copy of output data
+    virtual void operate() {
+        const jp_type& jp_in = input.getValue();    // Pull data from the input
+        jp_offsets[5] += 0.001;         // Increase 6th joint-angle of WAM slightly
+        jp_out = jp_in + jp_offsets;    // Modify wam joints by relative offsets
+        outputValue->setData(&jp_out);  // Push data to subsequent system
+    }
+};
+\end{verbatim}
+  \caption{Example Libbarrett realtime system written in C++ that controls the 6th joint of the WAM to increase indefinitely. Namespace references removed for brevity.}
+  \label{pgm:rtsys}
+\end{Program}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
