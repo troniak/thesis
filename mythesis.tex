@@ -1,6 +1,7 @@
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
 \ProvidesFile{ubcsample.tex}[2012/04/07 v1.70 ^^J
  University of British Columbia Thesis]
+\PassOptionsToPackage{demo}{graphicx}
 \documentclass[msc,oneside]{ubcthesis}
 
 % \afterpage{\clearpage} right after a figure.  
@@ -16,6 +17,9 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{multirow}
+\usepackage{comment}
+%\excludecomment{figure}
+%\let\endfigure\relax
 %\usepackage{subfigure} % include multiple figures and captions within a single figure environment.
 %\usepackage{here}
 %\usepackage[subfigure, titles]{tocloft} % This allows you to use math in graph labels
@@ -41,9 +45,10 @@
 \program{Computer Science}
 \institutionaddress{Vancouver}
 \previousdegree{B.CS. Hons. Co-op, The University of Manitoba, 2011}
-\title{Mapping Environment Properties to Sensory Inputs for Robotic Manipulation}
+%\title{Mapping Environment Properties to Sensory Inputs for Robotic Manipulation}
+\title{Real-time Predictions from Unlabeled High-Dimensional Sensory Data during Non-prehensile Manipulation}
 \author{Daniel Michael Troniak}
-\copyrightyear{2013}
+\copyrightyear{2014}
 \submitdate{\monthname\ \number\year} % The "\ " is required 
 
 \renewcommand\thechapter      {\arabic{chapter}}
@@ -62,13 +67,15 @@
 \maketitle                      %% Mandatory
 
 \begin{abstract}                %% Mandatory -  maximum 350 words
-For one to manipulate an object, one must first make judgments about the object such as its mass, shape, size, and function. For example, if I were to pick up an object which was heavier than predicted, such as an overweight suitcase, I would need to detect this fact and adapt my lifting strategy. Thus, to successfully program a robot to perform manipulation tasks, it becomes useful to first equip it with the means to perceive its environment. 
-
-Sensors have been developed that take various measurements such as the amount of force applied to a manipulator or amount of pressure applied to a surface. Gaining abstract understanding of an environment, for example that a suitcase is heavy and its handle is slippery, typically requires combinations of sensor readings to predict accurately. As more sensors are added to the system, however, a cost increase to transmitting and subsequently processing the resulting data is experienced.
-
-In this thesis, I first present existing ways in which touch sensors are used and processed to gain abstract understanding of environments. I then review neuroscience and physiology literature on the current understanding of how the human motor system processes and acts on sensor data. I then present our novel approach to predicting properties of an environment in real-time using a large number of touch sensors, such as force, torque and tactile feedback, mounted to a Barrett WAM robot with attached BarrettHand as the robot performs a prescribed manipulation.
-
-I introduce a novel metric that quantifies the usefulness of any given sensor reading to predicting properties of an environment relevant to the manipulation, including the mass and stiffness of a manipulated block as well as the coefficient of static friction between the block and the table surface. Real-time environment property predictions are made possible by selecting just the top 5\% of sensor readings according to this metric. A 6.14\% decrease to the mean percentage error in the predicted properties is also achieved compared to making predictions based on all available sensor readings.
+Robots can be readily equipped with sensors that span a growing range of modalities and
+price-points.  
+However, as sensors increase in number and variety, making the best use of the rich multi-modal sensory streams becomes increasingly challenging. 
+In this thesis, we demonstrate the ability to make efficient and accurate task-relevant predictions from unlabeled streams of sensory data for a non-prehensile manipulation task. Specifically, we address the problem of making real-time predictions of the mass, friction coefficient, and compliance of a block during a topple-slide task, using an unlabeled mix of 1650 features composed of pose, velocity, force, torque, and tactile sensor data samples taken during the motion. 
+Our framework employs a partial least squares (PLS) estimator as computed based on training data. 
+Importantly, we show that the PLS predictions can be made significantly more accurate and robust to noise with the use of a feature selection heuristic, the {\em task variance ratio}, while using as few as 5\% of the original sensory features. 
+This aggressive feature selection further allows for reduced bandwidth when streaming sensory data and reduced computational costs of the predictions. 
+We also demonstrate the ability to make online predictions based on the sensory information received to date. We compare PLS to other regression methods, such as principal components regression. 
+Our methods are tested on a WAM manipulator equipped with either a spherical probe or a BarrettHand with arrays of tactile sensors.
 \end{abstract}
 
 \input{preface}
@@ -81,7 +88,7 @@ I introduce a novel metric that quantifies the usefulness of any given sensor re
 \input{acknowledgements}
 
 \chapter[Dedication]{} %% Optional
-Dedicated to my wife Jill and daughter Jade.
+Dedicated to Jill and Jade.
 
 \mainmatter % Now regular page numbering begins.
 
@@ -97,8 +104,8 @@ Dedicated to my wife Jill and daughter Jade.
 \bibliography{allbibs}
 
 \appendix
-%\input{software}
-\input{hardware}
+\input{software}
+%\input{hardware}
 
 \backmatter
 

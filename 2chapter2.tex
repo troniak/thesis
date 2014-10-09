@@ -5,61 +5,47 @@
 
 In the present study, we consider the general research question: how should robots be programmed to manipulate (e.g. grasp) objects? 
 There exist two common approaches to this problem in the robotics literature.
-One approach is to provide the robot with an apriori model of its environment. 
+One approach is for a human expert to provide the robot with an analytical model of itself and its environment. 
 Using this model, the robot achieves its manipulation goals in two phases: planning and execution.
 %plans an end-effector trajectory and then executes that trajectory to perform the desired manipulation.
 Planning is often performed in simulation using models of object geometry and robot/environment dynamics.
 Once the robot has found a feasible plan, it then executes that plan via physical robot actuation.
-One disadvantage to this \emph{model-based} approach is that due to imperfect dynamical models and robot calibration, executed manipulations can easily become unstable and fail \cite{dang2012tactile}.
+One disadvantage to this approach is that due to imperfect precalculated dynamical models and robot calibration, executed manipulations can easily become unstable and fail \cite{dang2012tactile}.
 
-Another approach is to formulate the manipulation task as a control problem that utilizes force, torque, and tactile sensors to improve robustness.
-The key advantages of this \emph{model-free} approach are that apriori object and dynamical models and excess planning are not necessarily required to succeed in the task.
-As well, the robot is granted the capacity to adapt to unexpected changes in the environment.
-This results in a system that is robust to pose uncertainties without complete dependence on detailed human-generated environmental models \cite{dang2012tactile}.
+%Another approach is to formulate the manipulation task as a control problem that utilizes force, torque, and tactile sensors to improve robustness.
+Another approach is to remove the requirement of human-supplied models and have the models learned autonomously from data using statistical learning techniques.
+The key advantages of this type of \emph{model-free} approach~\cite{Spall1998,hornung2014anomaly} are that apriori object and dynamical models are not required to succeed in the task; the model is learned automatically from data.
+In this thesis, we define \emph{model-free} \cite{Spall1998} systems as those that function without given explicit knowledge of physics or geometry from human experts.
+%As well, the robot is granted the capacity to adapt to unexpected changes in the environment.
+%This results in a system that is more robust to pose uncertainties without complete dependence on detailed human-calculated environmental models \cite{dang2012tactile}.
 
 %The latter approach is also closer to how the human motor system is known to function (see Section \ref{high_level_processes}).  
 %There is ample physiology and neuroscience literature from which inspiration and insight to devising successful manipulation schemes can be drawn based on the human sensory system, with much success already attained \cite{felip2011emptying, leoni1998implementing, romano2011human, sikka1994tactile}.
 
-\subsection{Model-based schemes}
-
-In \emph{model-based} schemes, a human expert provides the robot apriori models which, for example, map control policies to specific sensory input signals.
-%This approach grants the advantage of providing the robot access to the understanding of the task dynamics of the researcher.
-The disadvantage of this approach is that the supplied model may contain errors and would not generalize to arbitrary changes in e.g. the kinematics of the robot.
-
-In \cite{felip2011emptying}, the authors present sensor-based atomic controllers for a robotic hand/arm system to empty a box containing an undefined number of unknown objects.
-Manipulation primitives are defined that search, grasp and transport objects from the box to predefined locations.
-A finite state machine (FSM) is used to transition between motion primitives based on corresponding sensory feedback.
-This FSM is presented graphically in Figure~\ref{fig:grasp_fsm}.
-The authors also compare a vision-plus-tactile-based version of their system to a purely tactile-based version.
-They found that while the version which incorporated vision was more efficient at completing the empty-the-box manipulation task, the tactile version was also successful.
-Vision was only crucial in determining if the box was empty; in the non-vision based system, a human moderator was required to tell the robot when it had finished its task.
-The authors in \cite{felip2011emptying} also present an interesting scheme that compensates for errors in translation of the robotic hand.
-The hand repositions itself if there is force experienced by only one finger, denoting a single hand/object contact.
-The controller compensates by moving the hand in direction of single contact, which effectively repositions the manipulator above the object.
-
-In \cite{Zhang2012}, a model-based approach is applied to the non-prehensile task of manipulating an object with rolling contacts across a robotic finger tip using tactile sensor feedback.
-Their approach relies on accurate apriori kinematic and dynamic models of the robot and its environment.
 
 
 \subsection{Model-free schemes}
 
-Another common approach to robotic manipulation in the literature is to analyze data compiled from a series of successful manipulations and extract features from the data that are indicative of successful manipulations.
-Once these features are acquired, they can then be used to predict success in future manipulations.
+%In this thesis, we define \emph{model-free} \cite{Spall1998} systems as those that function without given explicit knowledge of physics or geometry from human experts.
+%Instead, the model is learned autonomously from data using a machine learning algorithms.
+%Another approach to robotic manipulation in the literature is to analyze data compiled from a series of successful manipulations and extract features from the data that are indicative of successful manipulations.
+%Once these features are acquired, they can then be used to predict success in future manipulations.
 
-One example of such a learning scheme is called the Self-Organizing Map (SOM), an architecture of Artificial Neural Networks (ANN) that spatially and uniformly organizes features automatically by input signals \cite{kohonen1990self}.
+One example of such a learning technique is called the Self-Organizing Map (SOM), an architecture of Artificial Neural Networks (ANN) that spatially and uniformly organizes features automatically by input signals \cite{kohonen1990self}.
 An example where SOMs have been used successfully is in \cite{steffen2007experience}: objects are grasped based on hand posture and tactile experience of previously successful grasps.
 Experience is represented as a low dimensional smooth manifold in hand posture space. 
 %, which is implemented as a SOM-variant.
-Successful grasps are used to continually update the SOM experience base that is then used to guide subsequent grasps to their closest matching posture in the experience base.
-Figure~\ref{fig:grasp_som} depicts the experience base graphically.
+%Successful grasps are used to continually update the SOM experience base that is then used to guide subsequent grasps to their closest matching posture in the experience base.
+%Figure~\ref{fig:grasp_som} depicts the experience base graphically.
 
 A similar system was devised in \cite{ratnasingam2011object}, where a SOM was used to map finger joint angles and tactile readings to object shape and size.
 The system could identify previously grasped objects as well as categorize new objects as being a particular shape and size.
-The system successfully recognized 22 out of 25 different objects.
+%The system successfully recognized 22 out of 25 different objects.
 
 The same authors obtained similar results with another algorithm inspired by biological spiking neurons, called a spiking neural network \cite{ratnasingam2011spiking}.
 For this scheme, joint angle input is encoded into a series of spike trains which result in three feature outputs that are then used to recognize and classify grasped objects.
-In addition, similar objects tended to cluster in output feature space Figure~\ref{fig:sensory_clustering}).
+In addition, similar objects tended to cluster in output feature space.
+% Figure~\ref{fig:sensory_clustering}).
 The authors' system was able to recognize objects of different shapes as well as objects with the same shape but different size.
 
 In \cite{dang2011blind}, the authors present blind grasping: a novel approach to object grasping that does not require visual feedback or apriori 3D object models.
@@ -67,10 +53,34 @@ Their scheme works from a database of one thousand stable grasps from the Columb
 Corresponding tactile feedback during grasps of objects simulated in the GraspIt! simulator are also recorded.
 %Grasps are simulated in GraspIt!.
 They proceed to create feature vectors comprising simulated tactile and robot kinematic data which they then use to train an SVM to classify grasps as being stable or unstable. 
-Figure~\ref{fig:tact_example} demonstrates such a feature vector as representing a stable grasp.
-In this way, the system was able to learn tactile feedback necessary for a stable robotic grasp.
-Once these successful tactile and kinematic features are learned, the robot hand can move its wrist and re-shape its hand to explore the object until similar tactile contacts to grasps in the database are achieved.
+%Figure~\ref{fig:tact_example} demonstrates such a feature vector as representing a stable grasp.
+In this way, the system was able to learn tactile feedback indicative of a stable grasp.
+%Once these successful tactile and kinematic features are learned, the robot hand can move its wrist and re-shape its hand to explore the object until similar tactile contacts to grasps in the database are achieved.
 
+\subsection{Model-based schemes}
+
+In \emph{model-based} schemes, a human expert provides the robot apriori models which, for example, map sensory input signals to specific control policies. 
+This approach grants the advantage of providing the robot access to the understanding of the task dynamics of the researcher.
+The disadvantage of this approach is that the supplied model may contain errors and is limited by the domain expertise of the researcher.
+%would not generalize to aspects not specifically modeled.
+
+In \cite{felip2011emptying}, the authors present sensor-based atomic controllers for a robotic hand/arm system to empty a box containing an undefined number of unknown objects.
+Manipulation primitives are defined that search, grasp and transport objects from the box to predefined locations.
+A finite state machine (FSM) is used to transition between motion primitives based on corresponding sensory feedback.
+%This FSM is presented graphically in Figure~\ref{fig:grasp_fsm}.
+The authors also compare a vision-plus-tactile-based version of their system to a purely tactile-based version.
+They found that while the version which incorporated vision was more efficient at completing the empty-the-box manipulation task, the tactile version was also successful.
+Vision was only crucial in determining if the box was empty; in the non-vision based system, a human moderator was required to tell the robot when it had finished its task.
+The authors in \cite{felip2011emptying} also present an interesting scheme that compensates for errors in translation of the robotic hand.
+The hand repositions itself if there is force experienced by only one finger, denoting a single hand/object contact.
+The controller compensates by moving the hand in direction of single contact, which effectively repositions the manipulator above the object.
+
+In~\cite{Lynch1999}, the authors take an analytical approach to the non-prehensile toppling task. 
+This approach, while successful, assumes knowledge of the dynamics of the entire system and would therefore not generalize to operation outside of controlled factory environments where complete models of robot-object interaction dynamics were unavailable.
+Another analytical approach to a non-prehensile tumbling task, given apriori models of how the system reacts to the robot at each phase of the task, is studied in~\cite{sawasaki1989tumbling}.
+
+In \cite{Zhang2012}, an analytical approach is applied to the non-prehensile task of manipulating an object with rolling contacts across a robotic finger tip using tactile sensor feedback.
+Their approach relies on accurate apriori kinematic and dynamic models of the robot and its environment.
 
 \subsection{Human-inspired schemes}
 
@@ -86,25 +96,25 @@ How these deficiencies are made up for, however, is a high degree of parallelism
 It is also known that the human motor system executes manpulations as a series of discrete states that transition based on afferent signals \cite{Johansson1984}.
 Since this type of model is appropriate for execution on a computer, it has been quite popular to model the robotic grasping task as a Finite State Machine (FSM), which transitions between states base on tactile or other intrinsic contact input events \cite{leoni1998implementing, sikka1994tactile}.
 
-In \cite{howe1993tactile}, Howe presents a comprehensive overview of robotic hand systems in his 1993 review article.
-Figure~\ref{fig:touch_sensors} shows a simplified schematic drawing of his design, which obtains inspiration from the physiology of the human hand.
-Howe's design has since been left virtually unchanged \cite{cutkosky2008force}.
+%In \cite{howe1993tactile}, Howe presents a comprehensive overview of robotic hand systems in his 1993 review article.
+%Howe's abstract design of robotic hands has since been left virtually unchanged \cite{cutkosky2008force}.
+%Figure~\ref{fig:touch_sensors} shows a simplified schematic drawing of his design, which obtains inspiration from the physiology of the human hand.
 %Not shown in Howe's diagram, however, is another popular fingertip sensor implementation based on calculating the deformation of a bag of fluid, as shown in Figure~\ref{fig:fingertip_sensors}.  
 
 %FIGURE
-\begin{figure}[hbt]
-	\centering
-	\includegraphics[width=\linewidth]{images/touch_sensors}
-	\caption{Schematic drawing of a robotic hand with several types of contact sensors \cite{howe1993tactile}.}
-	\label{fig:touch_sensors}
-\end{figure}
+%\begin{figure}[]
+%	\centering
+%	\includegraphics[width=\linewidth]{images/touch_sensors}
+%	\caption{Schematic drawing of a robot hand with several types of contact sensors, reproduced from \cite{howe1993tactile}. Permission to reproduce is pending.}
+%	\label{fig:touch_sensors}
+%\end{figure}
 %ENDFIGURE
 
 The authors in \cite{leoni1998implementing} present an approach to tactile-motor coordination of a robotic hand based on a neurological model of the human tactile-motor system.
 This model is implemented as a series of ANNs whose function and structure reflect discoveries in the human sensory areas specific to object grasping.
 A scheme based on SOMs was chosen to model these sensory areas, since they must process a high rate of combined tactile and somatosensory input.
 Use of the SOM controlled the volume of incoming inputs by making small, efficient adjustments to the model each time a new input vector became available.
-See Figure~\ref{fig:sensor_processing} for a graphical overview of their overall system.
+%See Figure~\ref{fig:sensor_processing} for a graphical overview of their overall system.
 
 The authors in \cite{romano2011human} developed a human-inspired robotic grasp controller that gently picks up and sets down unknown objects.
 They employ pressure sensors and accelerometers to mimic SA-I, FA-I and FA-II tactile channels (see Section \ref{touch_sensing}).
@@ -112,20 +122,20 @@ A FSM is programmed to transition between six discrete states: (1) Close, (2) Lo
 Transitions are based entirely on tactile event cues.
 Their controller also dynamically adapts its initial grasp force depending on tactile events such as slipping, and judges when to set down the object in light of detected contact events with the table.
 
-In \cite{sikka1994tactile}, a new tactile-based object manipulation strategy was proposed, called tactile servoing.
+In~\cite{sikka1994tactile}, a new tactile-based object manipulation strategy was proposed, called tactile servoing.
 Analogous to vision-based visual servoing, each state in the manipulation task sequence is characterized by tactile images detected via tactile sensor arrays on the robot hand.
-An example of such a tactile image can be found in Figure~\ref{fig:tactile_input}.
+%An example of such a tactile image can be found in Figure~\ref{fig:tactile_input}.
 The authors' conclusion was that tactile sensors are useful in simple, direct and effective control of robots during manipulation tasks.
-The literature supports the fact that tactile data is processed much the same way that visual data is processed in the brain \cite{johansson2001eye, scilingo2004perception}.
+The literature supports the fact that tactile data is processed much the same way that visual data is processed in the brain~\cite{johansson2001eye, scilingo2004perception}.
 
 \section{Sensory Information Processing}
 
 %In this section, we present work on efficient processing of sensory input data, as collected during a robotic manipulation.
 
-\subsection{Haptic Sensing for robotic manipulation}
+\subsection{Force and Tactile Sensing for robotic manipulation}
 
 %FIGURE (1.3)
-%\begin{figure}[hbt]
+%\begin{figure}[]
 %	\centering
 %	\includegraphics[width=\linewidth]{images/fingertip_sensors}
 %	\caption{Different fingertip sensors: (a) tactile array - extrinsic; (b) force/torque sensor - intrinsic; and (c) fluid-filled \cite{dasu2006information}.}
@@ -133,20 +143,20 @@ The literature supports the fact that tactile data is processed much the same wa
 %\end{figure}
 %%ENDFIGURE
 
-Tactile and other haptic sensing can provide information about mechanical properties, such as compliance, coefficient of friction, and mass, which are not perceivable through other means (e.g. vision) \cite{howe1993tactile}.
-Obtaining object properties via haptics for the purposes of succeeding in manipulation tasks has been the subject of numerous studies \cite{Heidemann2004, Detry2011, lepora2012embodied}.
+Tactile and other force and tactile sensing can provide information about mechanical properties, such as compliance, coefficient of friction, and mass, which are not perceivable through other means (e.g. vision) \cite{howe1993tactile}.
+Obtaining object properties via force and tactile sensing for the purposes of succeeding in manipulation tasks has been the subject of numerous studies \cite{Heidemann2004, Detry2011, lepora2012embodied}.
 
-The application of haptic sensors to many robotics problems affords new solutions that have previously been intractable via traditional, often computer vision-based methods \cite{lee1999review}.
-In their 2005 review article, Tegin and Wikander \cite{tegin2005tactile} stress that, in contrast to the amount of literature on the application of vision-based solutions to robotics problems, few literature exist on exploiting contact information (e.g. tactile).
-One reason may be simply due to the lack of availability of haptic sensors in comparison to cameras \cite{howe1993tactile}.
+The application of force and tactile sensors to many robotics problems affords new solutions that have previously been intractable via traditional, often computer vision-based methods \cite{lee1999review}.
+In their 2005 review article, Tegin and Wikander \cite{tegin2005tactile} stress that, in contrast to the amount of literature on the application of vision-based solutions to robotics problems, literature on exploiting contact information (e.g. tactile) remains relatively rare.
+One reason may be simply due to the lack of availability of force and tactile sensors in comparison to cameras \cite{howe1993tactile}.
 
 While vision is arguably the dominant sense in primates, including humans, there are certain scenarios in which vision fails, such as during object occlusion or when sensory resolution is too low for a given task.
 In such cases, more detailed and versatile contact information may compensate for these deficiencies.
 
-In \cite{cutkosky2008force} the authors review techniques for processing and combining haptic information to develop abstract understanding of a given manipulation.
-%present various layers of processing that transform raw haptic-sensor inputs into abstract understanding of an environment, such as object shape and contact types.
-These processing techniques are shown graphically in Figure~\ref{fig:touch_id}.
-The authors state that haptic sensors have potential to yield the following information:
+In \cite{cutkosky2008force} the authors review techniques for processing and combining force and tactile information to develop abstract understanding of a given manipulation.
+%present various layers of processing that transform raw force and tactile-sensor inputs into abstract understanding of an environment, such as object shape and contact types.
+These processing techniques are shown graphically in Figure~\ref{fig:touch_id}: as raw sensory data travels from left to right, they are processed and combined to provide increasingly abstract understanding of a manipulation.
+The authors state that force and tactile sensors have potential to yield the following information:
 (1) object contact/no contact; 
 (2) contact configuration (surface, edge, point, etc.) based on pressure-patterns; 
 (3) object slip via vibrations in the grasped object, 
@@ -159,10 +169,10 @@ Given the above information, a robot can more appropriately control the force an
 
 \subsubsection*{Example}
 
-\begin{figure}[hbt]
+\begin{figure}[]
 	\centering
 	\includegraphics[width=\linewidth]{images/pen_twirling}
-	\caption{Schematic drawing of the pen-twirling task. Drawings acquired from \cite{elliott1984classification}.}
+	\caption{Schematic drawing of the pen-twirling task. Drawings reproduced from \cite{elliott1984classification}. Use of the reproduction is by permission of the copyright owner, John Wiley and Sons.}
 	\label{fig:pen_twirling}
 \end{figure}
 
@@ -172,8 +182,17 @@ The position and orientation of the object must somehow match imposed forces to 
 Successfully tracking the movement of the pen requires the knowledge of many variables, such as the configuration of one's hand, the locations and movements of contacts between the pen and one's fingers, the magnitudes of grasp forces, the contact conditions with respect to friction limits, etc.
 How is it that, with enough practice, one can control all of these parameters effortlessly, even in the absense of visual feedback? 
 
-A potential answer can be seen in Figure~\ref{fig:touch_id}: starting at the upper-left corner, we can combine the forward kinematic model of the hand together with current finger joint angles to determine the positions and orientations of the finger tips.
+A potential answer can be seen in Figure~\ref{fig:touch_id}: we can combine the forward kinematic model of the hand together with current finger joint angles to determine the positions and orientations of the finger tips.
 When combined with force/torque measurements at the points of contact, it is possible to obtain local information of object shape, surface normal orientation, etc., which could then be combined to track the geometric pose of the object.
+
+%Figure 2.8: 
+\begin{figure}[]
+	\centering
+	\includegraphics[width=\linewidth]{images/touch_id}
+	\caption{Force and tactile sensor processing to estimate object pose \cite{cutkosky2008force}.}
+	\label{fig:touch_id}
+\end{figure}
+%ENDFIGURE
 
 \subsubsection*{Tactile sensing}
 
@@ -186,8 +205,8 @@ Features, such as holes, edges and corners \cite{cutkosky2008force} and object s
 For example, Siegel \cite{siegel1991finding} devised a way to extract object pose of a known object in a robot's grasp via joint angle and joint torque measurements.
 
 \subsubsection*{Active Sensing}
-%The common solution to obtaining object properties via haptic sensing is to use carefully-tailored exploratory procedures that allow the desired properties to be easily and directly predicted from the gathered data \cite{ruiz2010prediction}.
-Since haptic sensors provide only local object information, recognition and disambiguation often require the hand to actively explore multiple areas of the object surface.
+%The common solution to obtaining object properties via force and tactile sensing is to use carefully-tailored exploratory procedures that allow the desired properties to be easily and directly predicted from the gathered data \cite{ruiz2010prediction}.
+Since force and tactile sensors provide only local object information, recognition and disambiguation often require the hand to actively explore multiple areas of the object surface.
 These types of strategies are referred to as active sensing.
 There exist many example applications of active sensing, such as tracing object contours, measuring compliance and determining lateral extent of object surfaces.
 In \cite{muthukrishnan1987edge}, the authors propose an active sensing strategy to edge-finding by exploring the surface of an object until contiguous segments of tactile array impressions are found.
@@ -224,55 +243,55 @@ The result is a transformed, lower-dimensional set of features that more compact
 In contrast, feature \emph{selection} techniques, such as those based on feature similarity \cite{mitra2002unsupervised} and genetic algorithms \cite{huang2006ga}, achieve dimensionality reduction by considering only a subset of input dimensions. 
 In \cite{pais2013learning}, the authors present a novel feature selection method comparing the variance of sensor readings to choose to encode either force or position information while recording user-demonstrated trajectories.
 
-%FIGURE (2.2)
-\begin{figure}[hbt]
-	\centering
-	\includegraphics[width=\linewidth]{images/grasp_fsm}
-	\caption{Discrete states and transition conditions in the finite state machine that defines the empty-the-box manipulation task \cite{felip2011emptying}.}
-	\label{fig:grasp_fsm}
-\end{figure}
-%ENDFIGURE
+%%FIGURE (2.2)
+%\begin{figure}[]
+%	\centering
+%	\includegraphics[width=\linewidth]{images/grasp_fsm}
+%	\caption{Discrete states and transition conditions in the finite state machine that defines the empty-the-box manipulation task \cite{felip2011emptying}.}
+%	\label{fig:grasp_fsm}
+%\end{figure}
+%%ENDFIGURE
 
-%Figure 2.3: 
-\begin{figure}[hbt]
-	\centering
-	\includegraphics[width=\linewidth]{images/sensor_processing}
-	\caption{Structure of ANNs chosen by the authors as a model for human grasping \cite{leoni1998implementing}.}
-	\label{fig:sensor_processing}
-\end{figure}
-%ENDFIGURE
+%%Figure 2.3: 
+%\begin{figure}[]
+%	\centering
+%	\includegraphics[width=\linewidth]{images/sensor_processing}
+%	\caption{Structure of ANNs chosen by the authors as a model for human grasping \cite{leoni1998implementing}.}
+%	\label{fig:sensor_processing}
+%\end{figure}
+%%ENDFIGURE
 
-%Figure 2.4: 
-\begin{figure}[hbt]
-	\centering
-	\includegraphics[width=\linewidth]{images/tactile_input}
-	\caption{Example tactile image during the rolling-pin task by planar robot finger equipped with tactile sensor array in \cite{sikka1994tactile}.
-Darkness indicates pressure intensity.}
-	\label{fig:tactile_input}
-\end{figure}
-%ENDFIGURE
+%%Figure 2.4: 
+%\begin{figure}[]
+%	\centering
+%	\includegraphics[width=\linewidth]{images/tactile_input}
+%	\caption{Example tactile image during the rolling-pin task by planar robot finger equipped with tactile sensor array in \cite{sikka1994tactile}.
+%Darkness indicates pressure intensity.}
+%	\label{fig:tactile_input}
+%\end{figure}
+%%ENDFIGURE
 
-%Figure 2.5: 
-\begin{figure}[hbt]
-	\centering
-	\includegraphics[width=\linewidth]{images/grasp_som}
-	\caption{Discrete grasp manifold of successful grasps based on the SOM.
-Note how similar grasp postures are organized together which results in fast queries of the experience base \cite{steffen2007experience}.}
-	\label{fig:grasp_som}
-\end{figure}
-%ENDFIGURE
-
-%FIGURE (1.8)
-\begin{figure}[hbt]
-	\centering
-	\includegraphics[width=\linewidth]{images/sensory_clustering}
-	\caption{Clusters of outputs from trained spiking neural network for certain objects \cite{ratnasingam2011spiking}.}
-	\label{fig:sensory_clustering}
-\end{figure}
-%ENDFIGURE
+%%Figure 2.5: 
+%\begin{figure}[]
+%	\centering
+%	\includegraphics[width=\linewidth]{images/grasp_som}
+%	\caption{Discrete grasp manifold of successful grasps based on the SOM.
+%Note how similar grasp postures are organized together which results in fast queries of the experience base \cite{steffen2007experience}.}
+%	\label{fig:grasp_som}
+%\end{figure}
+%%ENDFIGURE
+%
+%%FIGURE (1.8)
+%\begin{figure}[]
+%	\centering
+%	\includegraphics[width=\linewidth]{images/sensory_clustering}
+%	\caption{Clusters of outputs from trained spiking neural network for certain objects \cite{ratnasingam2011spiking}.}
+%	\label{fig:sensory_clustering}
+%\end{figure}
+%%ENDFIGURE
 
 %%FIGURE (1.9, 2.7)
-%\begin{figure}[hbt]
+%\begin{figure}[]
 %	\centering
 %	\includegraphics[width=\linewidth]{images/grasp_tactile_example}
 %	\caption{Example grasp feature vector in successful grasp database: (a) shows the kinematic state of the grasp around the object, (b) (c) (d) and (e) represent the tactile feedback experienced by the first, second, third fingers and palm of the BarrettHand respectively.}
@@ -280,40 +299,31 @@ Note how similar grasp postures are organized together which results in fast que
 %\end{figure}
 %%ENDFIGURE
 
-%Figure 2.8: 
-\begin{figure}[hbt]
-	\centering
-	\includegraphics[width=\linewidth]{images/touch_id}
-	\caption{Haptic sensor information flow and signal processing \cite{cutkosky2008force}.
-As raw sensory data travels from left to right, they are processed and combined to provide increasingly abstract understanding of a manipulation.}
-	\label{fig:touch_id}
-\end{figure}
-%ENDFIGURE
 
-%FIGURE (?, 2.8)
-\begin{figure}[hbt]
-	\centering
-	\includegraphics[width=\linewidth]{images/grasp_tactile_example}
-	\caption{Example grasp feature vector in successful grasp database: (a) shows the kinematic state of the grasp around the object, (b) (c) (d) and (e) represent the tactile feedback experienced by the first, second, third fingers and palm of the BarrettHand respectively \cite{dang2011blind}.}
-	\label{fig:tact_example}
-\end{figure}
-%ENDFIGURE
+%%FIGURE (?, 2.8)
+%\begin{figure}[]
+%	\centering
+%	\includegraphics[width=\linewidth]{images/grasp_tactile_example}
+%	\caption{Example grasp feature vector in successful grasp database: (a) shows the kinematic state of the grasp around the object, (b) (c) (d) and (e) represent the tactile feedback experienced by the first, second, third fingers and palm of the BarrettHand respectively \cite{dang2011blind}.}
+%	\label{fig:tact_example}
+%\end{figure}
+%%ENDFIGURE
 
 \begin{landscape}
 %FIGURE (2.11, 2.12)
 \begin{figure}
-    %\begin{subfigure}[hbt]{0.515\linewidth}
+    %\begin{subfigure}[]{0.515\linewidth}
     %    \includegraphics[width=\linewidth]{images/power_grasps}
     %    \caption{Taxonomy of power manipulation skills \cite{howe1993tactile}.}
     %    \label{fig:power_taxonomy}
     %\end{subfigure}
-    %\begin{subfigure}[hbt]{0.485\linewidth}
+    %\begin{subfigure}[]{0.485\linewidth}
     %    \includegraphics[width=\linewidth]{images/precision_grasps}
     %    \caption{Taxonomy of precision manipulation skills \cite{howe1993tactile}.}
     %    \label{fig:precision_taxonomy}
     %\end{subfigure}
     \includegraphics[width=\linewidth]{images/grasp_dichotomy}
-    \caption{Dichotomy of human grasping \cite{cutkosky1989grasp}.}
+    \caption{Dichotomy of human grasping, reproduced from \cite{cutkosky1989grasp}, \copyright 1989 IEEE. }
 %Non-prehensile grasping uses gravity as a means of securing the object to the hand.
     \label{fig:grasp_dichotomy}
 \end{figure}
@@ -322,12 +332,12 @@ As raw sensory data travels from left to right, they are processed and combined 
 
 \section{Neuroscience \& Physiology}
 
-\begin{figure}[hbt]
-	\centering
-	\includegraphics[width=\linewidth]{images/sensory_homunculus_penfield}
-	\caption{Human Cortical Homunculus of Penfield and Rasmussen \cite{penfield1950cerebral}.}
-	\label{fig:sensory_homunculus_penfield}
-\end{figure}
+%\begin{figure}[]
+%	\centering
+%	\includegraphics[width=\linewidth]{images/sensory_homunculus_penfield}
+%	\caption{Human Cortical Homunculus of Penfield and Rasmussen, reproduced from \cite{penfield1950cerebral}. Permission to reproduce is pending.}
+%	\label{fig:sensory_homunculus_penfield}
+%\end{figure}
 
 Studying the manipulation capabilities of humans and animals for the purpose of designing better robotic systems is a challenge.
 First, it is hard to discover the precise algorithms that our brains employ.
@@ -345,9 +355,18 @@ Humans employ a wide variety of manipulation skills depending on the object bein
 When opening a jar, for example, a power-style grip is required to loosen the jar.
 Once the lid is loose and required torque is lessened, a lighter grip is adopted for speed and precision.
 This dichotomy of power/precision prehensile (i.e. grasping) activities was proposed by Napier in 1956 \cite{napier1956prehensile}.
-Figure~\ref{fig:tie_rope} provides an example of these two patterns of activity in the manipulation task of tying a knot.
-Cutkosky and Wright also propose a taxonomy of human grasps in \cite{cutkosky1989grasp}, breaking down the dichotomy of power/precision even further (see ~\ref{fig:grasp_dichotomy}).
+Figure~\ref{fig:tie_rope} provides an example of these two patterns of activity in the manipulation task of tying a knot: power is required to hold the rope in place while precision is required to tie the knot. 
+Cutkosky and Wright also propose a taxonomy of human grasps in \cite{cutkosky1989grasp}, breaking down the dichotomy of power/precision even further (see Figure~\ref{fig:grasp_dichotomy}).
 Depending on the weight and size of the object as well as the desired dexterity of the hand, a human adopts a different style of grip.
+
+%FIGURE (2.10)
+\begin{figure}[]
+	\centering
+	\includegraphics[width=\linewidth]{images/tie_rope}
+	\caption{Tying a knot: manipulation task combining precision and power grips. Figure inspired by \cite{napier1956prehensile}.}
+	\label{fig:tie_rope}
+\end{figure}
+%ENDFIGURE
 
 
 \subsubsection*{Analytical measures of grasp quality}
@@ -389,6 +408,15 @@ An object likely requiring form closure would be for example a wet bar of soap o
 While adequately large grip forces must be maintained to keep the object within a force closure grasp, exceedingly large forces are also not desirable as they cause unnecessary fatigue on the hand and may even crush fragile objects \cite{johansson1994grasp}, \cite{gorniak2010manipulation}.
 Thus, grip force is constrained by both the slipping and crushing thresholds of objects (see Figure~\ref{fig:grip_crush_force} for some examples).
 
+%Figure 2.11: 
+\begin{figure}[]
+	\centering
+	\includegraphics[width=\linewidth]{images/grip_crush_force}
+	\caption{Example slipping and crushing thresholds of everyday objects \cite{romano2011human}. The difference between the required Minimum Force and observed Grip Force is known as the \emph{safety margin}.}
+	\label{fig:grip_crush_force}
+\end{figure}
+%ENDFIGURE
+
 The amount of force that subjects apply over and above the slipping threshold is known as the \emph{safety margin}.
 The magnitude of the safety margin varies across subjects, and was found to be dependent on the dexterous manipulation skill of the subject in performing the given task \cite{Johansson1984}.
 
@@ -400,7 +428,7 @@ Accurate predictions are crucial however due to the relatively slow response rat
 %Information on objects involved can be predicted as well.
 %If grasp stability errors occur, real-time corrective actions are taken.
 
-\subsection{Haptic sensing}
+\subsection{Force and tactile sensing}
 \label{touch_sensing}
 The elements of the human sense of touch can be broken up into two distinct categories: proprioceptive and tactile.
 Proprioceptive sensing refers to the perception of limb motion and forces using internal receptors, such as muscle spindles (responding to changes in muscle length), tendon organs (measuring muscle tension), and cutaneous afferents (reacting to skin deformations around the joints) \cite{johansson2009coding}.
@@ -417,6 +445,16 @@ fast adapting, respectively).
 See Figure~\ref{fig:tactile_afferents} for a description of each of these types.
 It has been calculated that a total of 17,000 specialized mechanoreceptors exist in the grasping surfaces of the human hand \cite{johansson2009coding}.
 In addition, there are free nerve endings that are sensitive to thermal and pain stimuli \cite{howe1993tactile}.
+
+%Figure 2.10: 
+\begin{figure}[]
+	\centering
+	\includegraphics[width=0.7\textwidth]{images/tactile_afferents}
+	\caption{Characteristic of tactile afferents within human fingertip skin.
+Reproduced from \cite{johansson2009coding}. Permission to reproduce is pending. Permission to reproduce is pending.}
+	\label{fig:tactile_afferents}
+\end{figure}
+%ENDFIGURE
 
 \subsection{High-level processes}
 \label{high_level_processes}
@@ -477,35 +515,8 @@ For example, FA-I afferents react more strongly to slippery surfaces \cite{burst
 Robust processing of tactile afferent information is attributed to the brain's innate ability to detect coincidence: a phenomenon in which its central neurons receive synchronous input spikes from many distinct tactile afferents \cite{hopfield1995pattern}.
 Therefore, noise in the environment, i.e. information unrelated to the current focus of attention, can be characterized by input spikes which do not arrive at the brain at the same precise moment in time as input deemed valuable to the current task.
 
-%Figure 2.10: 
-\begin{figure}[hbt]
-	\centering
-	\includegraphics[width=0.7\textwidth]{images/tactile_afferents}
-	\caption{Characteristic of tactile afferents within human fingertip skin.
-Adapted from \cite{johansson2001eye}.}
-	\label{fig:tactile_afferents}
-\end{figure}
-%ENDFIGURE
 
-%Figure 2.11: 
-\begin{figure}[hbt]
-	\centering
-	\includegraphics[width=\linewidth]{images/grip_crush_force}
-	\caption{Example of imparted safety margin when grasping everyday objects \cite{romano2011human}.
-Unfortunately, it appears as though the hand accidentally crushed the egg in one of the experiments.}
-	\label{fig:grip_crush_force}
-\end{figure}
-%ENDFIGURE
 
-%FIGURE (2.10)
-\begin{figure}[hbt]
-	\centering
-	\includegraphics[width=\linewidth]{images/tie_rope}
-	\caption{Tying a knot: manipulation task combining precision and power grips.
-Power is required to hold the rope in place while precision is required to tie the knot \cite{hopfield1995pattern}.}
-	\label{fig:tie_rope}
-\end{figure}
-%ENDFIGURE
 
 
 %\subsection{Non-prehensile manipulation} 
@@ -514,13 +525,11 @@ Power is required to hold the rope in place while precision is required to tie t
 %Non-prehensile manipulation has seen relatively little attention in robotics literature despite occupying a large part of the manipulation spectrum.
 %This may be attributed in part due to the difficulties of developing good models for non-prehensile object manipulation \cite{Lynch1998}.  
 %Knowledge of friction, mass, and compliance are important for manipulation tasks \cite{howe1993tactile}.  
-%In \cite{Lynch1999}, the authors take an analytical approach to a non-prehensile toppling task with an assumption of full knowledge of the dynamics.
 %In contrast, we develop a data-driven approach for identifying unknown dynamic properties.
+
 
 %%%%
 
-%In {Lynch1999}, the authors take an analytical approach to the non-prehensile toppling task. 
-%This approach, while successful, assumes knowledge of the dynamics of the entire system and would therefore not generalize to operation outside of controlled factory environments where complete models of robot-object interaction dynamics were unavailable.
 %Since our approach develops implicit models that are automatically learned by the system, developing complex apriori dynamical models of the interactions between the object and the robot is rendered redundant. %TODO: a bit too strong?
 
 %In \cite{Pastor2011}, a robot learns the trajectory required to grasp an object through kinesthetic teaching and records expected sensory data streams to increase the likelihood of subsequent task success in light of small environmental perturbations. 

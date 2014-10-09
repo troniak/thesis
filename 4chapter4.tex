@@ -6,20 +6,45 @@ In this chapter, we provide an overview of the software deployed to control the 
 %\section{Usage}
 %\section{Maintenance}
 
-\section{Libbarrett API} 
+\section{System Overview}
+To support experiments, a sensor processing and robot control framework was written in C++ leveraging the libbarrett API provided by Barrett Technology Inc (Section~\ref{sec:libbarrett}). 
+Our framework was developed exclusively on the internal PC of the WAM robot, the details of which are presented in Table~\ref{tbl:wam_specs}.
+%For more details on the hardware specifications, please see Appendix~\ref{apx_B}.
 
-The API used to communicate with the robot is called Libbarrett: a C++ library from Barrett Technology Inc. \cite{libbarrett}.
-This library provides abstract control of the WAM and BarrettHand and allows them to be controlled in tandem.
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+Motherboard        & Aaeon PFM-540I                    \\
+Processor          & 500 MHz AMD LX-800 x86-compatible \\
+Memory             & 256 MB 200-pin DDR-333 SODIMM     \\
+Linux distribution & Ubuntu 9.10                       \\
+Linux kernel       & 2.6.31.4                          \\
+Realtime           & Xenomai 2.5                       \\
+Ethernet           & 10/100 Base-T                     \\
+CANbus             & Peak PCAN-PC/104, 2 ports         \\ \hline
+\end{tabular}
+\caption{Specifications of the WAM Internal PC/104 \cite{wam_specs} used for framework development and robot control in support of experiments.}
+\label{tbl:wam_specs}
+\end{table}
+
+\section{Libbarrett API}
+\label{sec:libbarrett}
+
+The API used to communicate with the robot is called libbarrett: a C++ library from Barrett Technology Inc. \cite{libbarrett}.
+Our framework was tested using version 1.1.0 of the API.
+The libbarrett API provides abstract control of the WAM and BarrettHand and allows them to be controlled in tandem.
 Sample programs that perform simple control and sensor monitoring routines are provided, upon which our controller in the current study is based.
 
-Libbarrett provides three high-level constructs to interface with the robot: (1) the WAM object (2) the Hand object and (3) the ProductManager.
+Libbarrett provides three high-level constructs to interface with the robot: (1) the WAM object (2) the Hand object and (3) the ProductManager object.
 The WAM and Hand objects provide high-level control of the WAM and attached BarrettHand respectively.
-The ProductManager provides access to the WAM’s optional components, such as attached tools (e.g.  BarrettHand) and Force/Torque sensor.
+The ProductManager provides access to the WAM's optional components, such as attached tools (e.g.  BarrettHand) and Force/Torque sensor.
 The control software communicates with the Hand and WAM through high-level function calls to their respective libbarrett objects using a variety of pre-defined data structures. 
 These datastructures are presented in Table~\ref{tbl:data_types}.
 %Data types for interfacing with the WAM and BarrettHand are presented in Table~\ref{tbl:data_types}.
 
 \begin{table}[h]
+\centering
 \begin{tabular}{| c | c | c |}
     \hline
     Name & Type & Unit \\
@@ -42,7 +67,7 @@ Control in Cartesian space is a convenient way to prototype motions and is suffi
 Accuracy of the Cartesian positioning of the WAM is advertised at two millimeters.
 In practise, however, this accuracy depends largely on the joint-angle configuration of the WAM at the beginning of the Cartesian-space move.
 In my experiments, position error can easily accumulate to reach as high as one centimeter, depending on the joint-angle position of the robot at the beginning of the Cartesian-space move.
-These high errors may be due to imperfect inverse-kinematics currently available through the Libbarrett API.
+These high errors may be due to imperfect inverse-kinematics currently available through the libbarrett API.
 %Hand-tuned motions are more easily accomplished in Cartesian space when a specific motion within is desired and is effective only if the level of accuracy required is relatively low (0.5~1 cm).
 Cartesian trajectories were not sufficiently repeatable in our experiments since we required a precise and highly repeatable motion (accurate to within 1 mm) to perform our task across various environments.
 Moreover, the workspace accessible by rotating the wrist is limited by the angular configuration of its attaching joint. 
@@ -59,7 +84,7 @@ Joint-angle trajectories that accomplish specific Cartesian-space tasks are diff
 This necessitates kinesthetic teaching where the robot is trained to perform its task in Cartesian space by a human expert manually moving the robot tool to perform a task, while corresponding joint-space trajectories are recorded by the robot.
 
 \paragraph{Kinesthetic Teach-and-Play}
-The Libbarrett API comes equipped with kinesthetic teaching functionality via the teach-and-play module.
+The libbarrett API comes equipped with kinesthetic teaching functionality via the teach-and-play module.
 Teach-and-play records position information at the rate of 500Hz while a user physically moves the robot through the desired motions.
 The robot can record its trajectory in either Cartesian-space or joint-space.
 Again, due to imperfect inverse-kinematics, if a highly repeatable motion is required it is advisable to record trajectories in joint-space.
@@ -67,7 +92,7 @@ It becomes possible to execute highly repeatable Cartesian-space trajectories if
 
 \section{Barrett-Hand Control}
 
-In this section, we introduce the details on control of the BH8-280 Barrett-Hand through the Libbarrett API, as used in our experiments.
+In this section, we introduce the details on control of the BH8-280 Barrett-Hand through the libbarrett API, as used in our experiments.
 
 \paragraph{Velocity Move}
 The simplest form of control of each finger of the Hand is to specify a direction and rate of travel of each of the joints in the Hand.
@@ -87,10 +112,11 @@ It is necessary to ensure a clear path for each of the fingers and spread of the
 
 \section{Realtime Systems}
 \label{sec:realtime_eg}
-Control of the robot in realtime must be done through the Libbarrett realtime systems library.
+Control of the robot in realtime must be done through the libbarrett realtime systems API.
 Realtime control allows for complex and closed-loop motions since the output of each realtime system depends upon its inputs at each step of the realtime control loop at the rate of 500Hz.
 Program~\ref{pgm:rtsys} provides an example program which defines such a realtime system in the C++ programming language.
 
+\begin{landscape}
 \begin{Program}[width=0.5\pagewidth]
 \center
 \begin{verbatim}
@@ -115,9 +141,10 @@ protected:
     }
 };
 \end{verbatim}
-  \caption{Example Libbarrett realtime system written in C++ that controls the 6th joint of the WAM to increase indefinitely. Namespace references removed for brevity.}
+  \caption{Example libbarrett realtime system written in C++ that controls the 6th joint of the WAM to increase indefinitely. Namespace references removed for brevity.}
   \label{pgm:rtsys}
 \end{Program}
+\end{landscape}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 

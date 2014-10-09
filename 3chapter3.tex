@@ -1,8 +1,8 @@
-\chapter{Mapping Environment Properties to Sensory Inputs}
+\chapter{Predicting Environment Properties from Sensory Inputs}
 \label{chap3}
 
-In this chapter, I first formally define the problem of predicting characteristics of an environment using high-dimensional haptic sensor data. 
-I then present the prediction framework designed to solve this problem.
+In this chapter, we first formally define the problem of predicting characteristics of an environment using high-dimensional force and tactile sensor data. 
+We then present the prediction framework designed to solve this problem.
 
 \section{Problem Definition}
 %%%%DMT%%%%
@@ -32,7 +32,8 @@ I then present the prediction framework designed to solve this problem.
     \label{fig:Y_defn}
   \end{subfigure}
   %}
-  \caption{Collection of data matrix $\mathbf{D} = (\mathbf{X},\mathbf{Y})$: (a) data $\mathbf{X}$ are collected across all trials and environments; (b) environmental quantities $\mathbf{Y}$ are provided, which express each of $n_p = 144$ environments as $n_y=3$ floating point numbers.}
+  \caption{Collection of data matrix $\mathbf{D} = (\mathbf{X},\mathbf{Y})$: (a) data $\mathbf{X}$ are collected across all trials and environments; (b) environmental quantities $\mathbf{Y}$ are provided by the human expert.}
+  \label{fig:data_collect}
 \end{figure}
 
 %%% define the example motion and its purpose
@@ -71,9 +72,8 @@ The environment properties to be predicted from the sensory stream data are give
 In order to learn a predictive model $\mathbf{y}=f(\mathbf{x})$, training data is first gathered for $n_p$ different combinations of the environment properties, i.e., variations of mass, compliance, and friction.
 For each setting, the task is repeated $n_h$ times in each environment.
 The final dataset is thus defined by the following data pairs:
-\begin{equation}   \mathbf{D} = (\mathbf{X},\mathbf{Y}) = \{ (\mathbf{x}_{p,h},\mathbf{y}_{p})~\lvert~p\in[1\cdots n_p],h\in[1\cdots n_h] \}. \end{equation} 
-
-
+\begin{equation}   \mathbf{D} = (\mathbf{X},\mathbf{Y}) = \{ (\mathbf{x}_{p,h},\mathbf{y}_{p})~\lvert~p\in[1\cdots n_p],h\in[1\cdots n_h] \}, \end{equation} 
+show graphically in Figure~\ref{fig:data_collect}
 This dataset is used to learn the predictive model that we now describe.
 
 
@@ -109,7 +109,7 @@ We now discuss these two stages in further detail.
 \begin{figure}[tb]
   \centering
   \includegraphics[width=\linewidth]{images/TVR_intuition}
-  \caption{Intuition behind the task variance ratio ($\Gamma$) algorithm. We wish to select good sensors (at each time-phase) which exhibit low variance when the environment remains constant and high variance when the environment changes. Colors signify distinct environments. Multiple lines of the same color signify repeated trials within the same environment.}
+  \caption{Intuition behind the task variance ratio ($\Gamma$) algorithm. We wish to select good sensors (at each time-phase) which exhibit low variance when the environment remains constant and high variance when the environment changes. Colours signify data streams collected in distinct environments.}
   \label{fig:TVR_intuition}
 \end{figure}
 
@@ -152,20 +152,22 @@ We now discuss these two stages in further detail.
 %%%%%%
 %To cope with the high dimensional nature of the sensory stream data, we first describe a selection mechanism that is well suited to identifying specific sensors and sample times that are likely to be informative for the prediction problem.
 %\begin{equation}   \mathbf{D} = (\mathbf{X},\mathbf{Y}) = \{ (\mathbf{x}_{p,h},\mathbf{y}_{p})~\lvert~p\in[1\cdots n_p],h\in[1\cdots n_h] \}. \end{equation} 
-We define the {\em Task Variance Ratio ($\Gamma$)} vector as
+We define the {\em Task Variance Ratio} ($\Gamma$) vector as
 %   \begin{equation}  \Gamma = {\frac{\sigma^2_{enviro}}{\sigma^2_{trial}} | } ,\end{equation}
 \begin{equation} \Gamma = \{\Gamma^i=\frac{\mathit{Var}_i^{enviro}}{\mathit{Var}_i^{trial}}~\lvert~i\in[1\cdots n] \} \end{equation}
 where $\mathit{Var}_i^{trial}$ models the variance of a given element of $\mathbf{X}$ across all trials, 
 and $\mathit{Var}_i^{enviro}$ models the variance of the same element across all environments. 
-Specifically, 
-   %\begin{equation}\sigma^2_{trial} = \frac{\sum{(\mathbf{x}_{h}-\bar{\mathbf{x}_{h}})^2}}{n_h-1},\end{equation}
-  \begin{equation}\mathit{Var}_i^{trial}=\frac{\sum_{h=1}^{n_h}({\mathit{x}_{i,h})^2}-\frac{(\sum_{h=1}^{n_h}{\mathit{x}_{i,h}})^2}{n_h}}{n_h-1}\end{equation}
-%i.e., the variance of the given element as computed using all available measurements (all properties $p$ and trials $h$) in $\mathbf{D}$, 
-and 
-   %\begin{equation}\sigma^2_{enviro} = \frac{\sum{(\mathbf{x}_{p}-\bar{\mathbf{x}_{p}})^2}}{n_p-1},\end{equation}
-  \begin{equation}\mathit{Var}_i^{enviro} = \frac{\sum_{p=1}^{n_p}{(\mathit{x}_{i,p})^2}-\frac{(\sum_{p=1}^{n_p}{\mathit{x}_{i,p}})^2}{n_p}}{n_p-1}\end{equation}
-%i.e., the mean of the $n_p$ variances that can be computed when measurements are grouped according to environment properties.
-for all $i \in [1\cdots n]$.
+Specifically, for feature $i$:
+
+\begin{equation}
+  \mathit{Var}_i^{trial} = \frac{\sum_{p,h}( x_{i,p,h}^2 - \mu_{i,p}^2)}{n_pn_h-1}
+\end{equation}
+and
+\begin{equation}
+  \mathit{Var}_i^{enviro} = \frac{\sum_{p,h}( x_{i,p,h}^2 - \mu_{i}^2)}{n_pn_h-1},
+\end{equation}
+where $i,p,h$ are the indices for features, environment properties, and repeated trial     number,
+respectively; $\mu_{i,p} = \sum_{h} x_{i,p,h}/ n_h$; and $\mu_{i} = \sum_{p,h} x_{i,p,h}/  n_pn_h$. 
 
 A large value of $\Gamma_i$ indicates a good feature, as it implies that variation occurs as changes to the environment take effect, while observable noise between repeated trials in the same environment is relatively small.
 
@@ -197,7 +199,7 @@ In this way, we identify features in $\mathbf{X}$ that exhibit small variation a
 
 % is an effective prediction method in high-dimensional settings such as the one encountered here.
 
-The PLS algorithm provides us with an estimated weighting matrix $\mathbf{\beta} \in \mathbb{R}^{c\times n_y}$, where $c$ is a parameter denoting the number components to factor.
+The PLS algorithm provides us with an estimated weighting matrix $\mathbf{\beta} \in \mathbb{R}^{c\times n_y}$, where $c$ is a parameter denoting the number of components to factor.
 
 $\beta$ is calculated iteratively according to the following algorithm:
 first, define 
@@ -234,9 +236,10 @@ With $R$, $Q$ and $W$ assembled, we now compute:
   %\begin{equation} \beta = PLS(\mathbf{D}^*). \end{equation}
 Finally, we use $\beta$ at runtime to predict environment properties:
   \begin{equation} \mathbf{\hat{y}} = \mathbf{\beta} \cdot \mathbf{x^*_{new}} \end{equation}
+where $\mathbf{x^*_{new}}$ represents the reduced version (i.e. following $\Gamma$ feature selection) of a new unlabeled sensory data stream collected during a repetition of the motion in an unknown environment.
 
-Data from multiple haptic sensors are likely to be highly correlated, e.g. Cartesian force experienced by the hand and tactile pressure readings at the fingertips.
+Data from multimodal data streams are likely to be highly correlated, e.g. Cartesian force experienced by the hand and tactile pressure readings at the fingertips.
 In addition, there is likely to be significant correlation between sensor readings over time.
 Lastly, there are correlations between the input dimensions and output dimensions.
-The existance of these correlations are ideal in the application of the PLS  regression method \cite{Tobias1995}.
+The existance of these correlations are ideal in the application of the PLS regression method \cite{Tobias1995}.
 %--------------------------------------------------------------------------------------------------------------

@@ -1,16 +1,8 @@
 \chapter{Experiments and Results}
 \label{chap5}
 
-In this chapter, I describe the experimental setup, provide details on the experimental procedure, and finally present and discuss environment property prediction results obtained through the prediction framework.
+In this chapter, we describe the experimental setup, provide details on the experimental procedure, and finally present and discuss environment property prediction results obtained by using the prediction framework.
 
-%FIGURE ()
-\begin{figure}[]
-	\centering
-	\includegraphics[width=\linewidth]{images/topple}
-	\caption{The topple-and-slide task.}
-	\label{fig:topple}
-\end{figure}
-%ENDFIGURE
 
 \section{Setup}
 
@@ -105,7 +97,20 @@ We select $\Gamma_{\min}$ so as to select $0.1 \times n$ features.% in order to 
 \subsection{Partial Least Squares Modeling}
 Following PLS, we obtain the $\mathbf{\beta}$ coefficients.
 We can make the representation more compact by further choosing only the $\mathbf{\beta}$ coefficients of largest magnitude.
-In practice, we are able to make a further reduction of around 40\% without any significant impact on the prediction accuracy, as shown in Figure~\ref{fig:online}.
+In practice, we are able to make a further reduction of around 40\% without any significant impact on the prediction accuracy, as shown in Figure~\ref{fig:beta_reduc_comp}.
+The first row uses all features and no PLS reduction.  
+The second row uses a reduced set of 5\% selected features without PLS reduction. 
+The third row uses 5\% selected features, followed by 40\% PLS reduction. 
+%Following feature extraction step, the first and last time-phase of the motion are deemed irrelevant to the estimation task.
+
+%FIGURE 
+\begin{figure}[]
+	\centering
+	\includegraphics[width=\linewidth]{images/beta_reduc_comp}
+	\caption{Effect of varying degrees of PLS dimensionality reduction on mass estimation performance. A 20\% reduction is achievable with trivial loss in estimation quality.}
+	\label{fig:beta_reduc_comp}
+\end{figure}
+%ENDFIGURE
 
 \subsection{Online Prediction}
 
@@ -120,12 +125,30 @@ We define each $t^* \in T$ as a time-phase wherein at least $K$ sensors have rec
 %This ensures that we make predictions only once it actually plausible to do so.
 In practice, we choose a minimum $\Gamma$ so that $K=0.1 \times n_s$.
 By training separate models in this fashion, we are able to make predictions as soon as the robot enters any phase of the motion involving selected features.
-Figure~\ref{fig:online} demonstrates the prediction performance on-board the robot as it executes the task.
+Figures~\ref{fig:online}~and~\ref{fig:online_mfc_vid} demonstrate the prediction performance on-board the robot as it executes the task.
+
+%FIGURE 
+\begin{figure}[]
+	\centering
+	\includegraphics[width=\linewidth]{images/online_m}
+	\caption{Online estimation of the mass from sensory data using varying degrees of dimensionality reduction. The estimated mass of the block are shown at various blue points throughout the motion. The dotted red horizontal line denotes the actual mass of the block. }
+	\label{fig:online}
+\end{figure}
+%ENDFIGURE
+
+%FIGURE 
+\begin{figure}[]
+	\centering
+	\includegraphics[width=\linewidth]{images/online_mfc_vid}
+	\caption{Online estimation of mass, friction and compliance from sensory data following $\Gamma$ feature selection and PLS feature extraction. Time-phases 1 through 3, 9, and 15 through 18 are ignored since sensor readings during these time-phases do not provide any information with respect to distinguishing environment properties.}
+	\label{fig:online_mfc_vid}
+\end{figure}
+%ENDFIGURE
 
 \subsection{Calculating environment properties}
 \label{sec:property_calc_}
 In order for the robot to discover a mapping between sensor readings and environment properties, a unique numerical approximation of the underlying property must be calculated.
-See Figure~\ref{fig:property_calc} for a graphical overview of how the coefficient of friction and compliance are calculated.
+See Figure~\ref{fig:property_calc} for a graphical overview of how the coefficient of friction and compliance are calculated and Figure~\ref{vis_properties} for a photo of each of the environmental properties.
 
 \paragraph{Mass} 
 The mass of each unit is approximated using an off-the-shelf kitchen scale.
@@ -163,8 +186,28 @@ where $g$ is acceleration due to gravity.
         \caption{Compliance: ~~$c = d~/~(~m \cdot g~)$}
         \label{fig:compliance}
     \end{subfigure}
-    \caption{Calculating numerical representations of environment properties (a) coefficient of friction, $\mu$, and (b) compliance, $c$. $\theta$ represents the inclination of the frictional surface at the precise point the foam block begins to slide. Acceleration due to gravity is represented by the constant $g$.}
+    \caption{Calculating numerical representations of environment properties (a) coefficient of friction, $\mu$, and (b) compliance, $c$.}
     \label{fig:property_calc}
+\end{figure}
+
+\begin{figure}[]
+	%\centering
+    \begin{tabular}{c}
+        \begin{subfigure}[]{1\linewidth}
+            \includegraphics[width=\linewidth]{images/setup_m}
+            \caption{Eight units of 0.225kg mass which are used to vary the mass of the manipulated foam block from 0.445kg to 2kg.}
+        \end{subfigure} \\
+        \begin{subfigure}[]{1\linewidth}
+            \includegraphics[width=\linewidth]{images/setup_f}
+            \caption{Six surface frictions (from left to right): paper, plastic, wood, fine-sandpaper, coarse-sandpaper, cloth.}
+        \end{subfigure} \\
+        \begin{subfigure}[]{1\linewidth}
+            \includegraphics[width=\linewidth]{images/setup_c}
+            \caption{Three levels of compliance (from left to right): ethafoam, seafoam, greyfoam.}
+        \end{subfigure}
+    \end{tabular}
+    \caption{Environment properties used in experiments.}.
+    \label{fig:vis_properties}
 \end{figure}
 
 %------------------------------------------------------------------------------------
@@ -174,12 +217,12 @@ where $g$ is acceleration due to gravity.
 %%%TODO: video - mark topple and slide phases on data output plots
 %%%%%DMT%%%%%
 In what follows below, we comment on topple-slide experiments carried out with the robot hand, as well as with the spherical probe.
-We also encourage the reader to watch the supplemental video associated with this paper.
+We also encourage the reader to watch the supplemental video associated with this thesis.
 
 %%%%%%%%%%%%%%%% TVR visualization
 
 $\Gamma$ selection helps focus attention on specific sensors and motion-phases that are particularly likely to provide information useful to predicting environment properties.
-Figure~\ref{fig:tvr_tables} illustrates the selected features for the topple-slide task as executed by the robot arm with either the Hand or spherical probe as end effectors.
+Figure~\ref{fig:tvr_tables} illustrates the selected features for the topple-slide task as executed by the robot arm with either the Hand or spherical probe as end effectors (see Figure~\ref{wam}).
 Notice how clusters of $\mathbf{x}^*$ can be interpreted as defining important sensory events in the task sequence, which the robot should pay most attention to.
 The yellow shaded region corresponds to the topple phase and the blue shaded region corresponds to the slide phase.
 The motion phases where the arm is not in contact with the object are identified as being unimportant, as are the phases that mark the beginning and end of both of the topple and sliding phases.
@@ -187,6 +230,42 @@ In terms of sensors, the joint velocities, $jv_n$, are generally unimportant, wi
 Joints 2, 4, and 6 provide task-relevant information in their sensed torques and positions.
 Similar results are also obtained with the full hand attached to the robot arm, in which case there are over a hundred sensors sampled across 18 time phases of the motion.
 With the hand in place, the key sensors are determined as being the task wrench $\omega$, as measured by the force-torque sensor, the fingertip torques, $f$, and the fingertip tactile readings, $a$.
+
+%FIGURE 
+\begin{figure}[]
+	%\centering
+    \begin{center}
+    \begin{tabular}{c}
+        \begin{subfigure}[]{0.8\linewidth}
+            \includegraphics[width=\linewidth]{images/tvr_table_p}
+            \caption{Joint-velocities are not selected due to high noise.}
+            \label{fig:tvr_table_p}
+        \end{subfigure}\\
+        \begin{subfigure}[]{0.78\linewidth}
+            \includegraphics[width=\linewidth]{images/tvr_table_h}
+            \caption{Joint-torques, Cartesian-wrench and Hand-tactile selected for providing most task-relevant information to the system.}
+            \label{fig:tvr_table_h}
+        \end{subfigure}
+    \end{tabular}
+    \end{center}
+    \caption{Visualization of features selected according to the task variance ratio, $\Gamma$, of data collected using (a) robot with spherical probe and (b) robot with BarrettHand. Colour is added to signify task-phases. Gaps between task-phases signify an absence of task-relevant information within corresponding time-phases.}
+    \label{fig:tvr_tables}
+\end{figure}
+%ENDFIGURE
+
+\begin{figure}[]
+	%\centering
+    \begin{subfigure}[]{0.438\linewidth}
+        \includegraphics[width=\linewidth]{images/wam_p}
+        \caption{}
+    \end{subfigure}
+    \begin{subfigure}[]{0.490\linewidth}
+        \includegraphics[width=\linewidth]{images/wam_h}
+        \caption{}
+    \end{subfigure}
+    \caption{WAM robot with (a) spherical probe and (b) BarrettHand as end-effectors.}
+    \label{fig:wam}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%
 %%% DMT added: 
@@ -227,10 +306,30 @@ Our method identifies key points in the motion without any manually-tuned sensor
 To determine the impact of the $\Gamma$ feature selection, we compare mass predictions obtained using the inclusion of all features, i.e., no feature selection, and those obtained when $\Gamma$ feature selection is used to select a subset of 5\% of the the original features.
 This is applied to the manipulation task as executed using the spherical probe.
 In both cases, a non-reduced partial least squares model is constructed and leave-one-out-cross validation (LOOCV) test is considered for performance evaluation.
-As shown in Table~\ref{fig:TVR-perf}, the result produced using the significantly reduced subset of input features is in most tests better than that obtained when using all the features.
+As shown in Table~\ref{tbl:TVR_perf}, the result produced using the significantly reduced subset of input features is in most tests better than that obtained when using all the features and accuracy improves to within 1 measurement unit ($\pm$ 112.5 g) for all tests.
 Also, as can be seen in Table~\ref{tbl:tradeoff}, applying up to 20\% $\Gamma$ feature selection to the incoming datastreams enables real-time operation in terms of both data-transfer bandwidth and prediction runtime.
+Tradeoff calculations assume 1Mbit CANBus, 16MHz dedicated processing speed and a real-time control loop frequency of 500Hz. FLOPs are calculated using standard inner-product vector multiplication complexity of $2n-1$ for each of the three property predictions.
 %For experiments with the robot hand, reductions of up to 90\% using $\Gamma$-based feature selection continue to yield improvements.
 %This larger reduction is possible because of the large number of tactile sensors that are available with the hand.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{c|c|c|}
+\cline{2-3}
+\multicolumn{1}{l|}{}                  & \multicolumn{2}{c|}{Prediction RMSE (g)} \\ \hline
+\multicolumn{1}{|c|}{Mass (g)} & PLS + $\Gamma$    & PLS Only   \\ \hline
+\multicolumn{1}{|c|}{~425}           & 2.40              & 75.7         \\
+\multicolumn{1}{|c|}{~650}           & 13.9              & 86.9         \\
+\multicolumn{1}{|c|}{~875}           & 1.40              & 51.1         \\
+\multicolumn{1}{|c|}{1100}           & 15.8              & 40.8         \\
+\multicolumn{1}{|c|}{1325}           & 7.20              & 43.1         \\
+\multicolumn{1}{|c|}{1550}           & 0.20              & 37.2         \\
+\multicolumn{1}{|c|}{1775}           & 9.00              & 147         \\
+\multicolumn{1}{|c|}{2000}           & 11.0              & 7.20         \\ \hline
+\end{tabular}
+\caption{Effect of 5\% $\Gamma$ feature selection on LOOCV block mass prediction root mean squared error (RMSE). }
+\label{tbl:TVR_perf}
+\end{table}
 
 %%%%%%%%%%%%%%%%%% Effect of Beta reduction on the mass predict
 
@@ -272,9 +371,11 @@ with respective standard deviations of 4.2, 8.4, 14.6 and 83.2 as measured in $g
 Figure~\ref{fig:online} illustrates online mass prediction results. The robot is able to make predictions at any key time-phase, $t^{\star}$, each characterized by a high $\Gamma$ for many sensors. This is accomplished through building multiple models, each spanning the data from the start of the motion to some $t \in t^{\star}$.
 %illustrates the result for the mass predictions provided by the multiple PLS models.
 
-These results are obtained wherein the robot trains on $m = \{425, 650, 875, 1100, 1550, 1775, 2000\}$ as measured in $g$ and is then tested using sensory data obtained for $m=1335$ g.
+These results are obtained for the case of training on data for $m = \{425, 650, 875, 1100, 1550, 1775, 2000\}$ as measured in $g$ and is then tested using sensory data obtained for $m=1335$ g.
 The result shows predictions being made using increasingly fewer selected features or reduced PLS dimensions, as noted in the caption.
 Also, the predictions improve as the motion progresses and more selected features are observed.  
+
+Our framework is also robust to feature noise. To demonstrate this, we run experiments where we introduce large amounts of synthetic noise into the sensory data streams before Γ feature selection and after data whitening (see Section~\ref{sec:preprocess}). As shown in Table~\ref{tbl:add_noise}, LOOCV prediction RMSE increases smoothly as feature noise increases. Note that for even small amounts of additive noise ($\sigma^2 \approx 0.1$), PLS fails to produce meaningful results in the absence of $\Gamma$ feature selection.
 %%%%%%%%DMT%%%%%%%%
 %TODO: all three too similar: refocus on speedup instead of prediction performance.
 %%%%%%%%DMT%%%%%%%%
@@ -304,10 +405,25 @@ Also, the predictions improve as the motion progresses and more selected feature
 \multicolumn{1}{|r|}{\textbf{Bandwidth satisfied?}}       & T           & T         & T         & F   & F        & F        \\ \hline
 \multicolumn{1}{|r|}{\textbf{Accuracy satisfied?}}        & T           & T/F       & T         & T/F     & T        & F        \\ \hline
 \end{tabular}
-\caption{Bandwidth/runtime/accuracy tradeoff following different amounts of $\Gamma$ selection. Optimal tradeoff is achieved when between 5\% and 20\% of the data is selected using $\Gamma$. Assumes 1Mbit CANBus, 16MHz dedicated processing speed and a real-time control loop frequency of 500Hz. FLOPs are calculated using standard inner-product vector multiplication complexity of $2n-1$ for each of the three property predictions.}
+\caption{Bandwidth/runtime/accuracy tradeoff following different amounts of $\Gamma$ selection. Optimal tradeoff is achieved when between 5\% and 20\% of the data is selected using $\Gamma$.} 
 \label{tbl:tradeoff}
 \end{table}
 \end{center}
+
+\begin{table}[tb]
+\centering
+\begin{tabular}{c|c|}
+\hline
+\multicolumn{1}{|c|}{$\sigma^2$}   & RMSE (g)\\ \hline
+\multicolumn{1}{|c|}{0.0}      & 9.4  \\
+\multicolumn{1}{|c|}{0.5}      & 55.1 \\
+\multicolumn{1}{|c|}{1.0}      & 160.7  \\
+\multicolumn{1}{|c|}{1.5}      & 172.8  \\
+\multicolumn{1}{|c|}{2.0}      & 255.5  \\ \hline
+\end{tabular}
+\caption{Effect of different levels of additive Gaussian noise $\mathcal{N}( 0, \sigma^2   )$ on the sensory input data for LOOCV mass prediction RMSE ($m=1335$~g). Accuracy degrades smoothly as sensor noise increases.}
+\label{tbl:add_noise}
+\end{table}
 
 %---------------------------------------------------------------------------------------------------------------------
 \section{Discussion}
@@ -342,40 +458,8 @@ Rapid changes in the predicted environment properties, such as object compliance
 Also, implicit in the computation of $\mathit{Var}^{enviro}$ is a model of what value a sensory feature should have at a given point in the motion.
 This allows a motion anomaly to be signaled if a number of sensors each begin to signal anomalous values at a given point in time, or a sensor anomaly to be signaled if a single sensor begins to consistently produce anomalous readings.
 
-\begin{figure}[]
-	%\centering
-    \begin{tabular}{c}
-        \begin{subfigure}[]{1\linewidth}
-            \includegraphics[width=\linewidth]{images/setup_m}
-            \caption{Eight units of 0.225kg mass which are used to vary the mass of the manipulated foam block from 0.445kg to 2kg.}
-        \end{subfigure} \\
-        \begin{subfigure}[]{1\linewidth}
-            \includegraphics[width=\linewidth]{images/setup_f}
-            \caption{Six surface frictions (from left to right): paper, plastic, wood, fine-sandpaper, coarse-sandpaper, cloth.}
-        \end{subfigure} \\
-        \begin{subfigure}[]{1\linewidth}
-            \includegraphics[width=\linewidth]{images/setup_c}
-            \caption{Three levels of compliance (from left to right): ethafoam, seafoam, greyfoam.}
-        \end{subfigure}
-    \end{tabular}
-    \caption{environment properties used in experiments.}.
-    \label{fig:vis_properties}
-\end{figure}
 
 
-\begin{figure}[]
-	%\centering
-    \begin{subfigure}[]{0.438\linewidth}
-        \includegraphics[width=\linewidth]{images/wam_p}
-        \caption{}
-    \end{subfigure}
-    \begin{subfigure}[]{0.490\linewidth}
-        \includegraphics[width=\linewidth]{images/wam_h}
-        \caption{}
-    \end{subfigure}
-    \label{fig:wam}
-    \caption{We performed two experiments using the WAM robot with (a) spherical probe and (b) BarrettHand as end-effectors.}
-\end{figure}
 
 
 %FIGURE 
@@ -389,80 +473,10 @@ This allows a motion anomaly to be signaled if a number of sensors each begin to
 %\end{figure}
 %%ENDFIGURE
 
-\begin{table}[h]
-\centering
-\begin{tabular}{c|c|c|}
-\cline{2-3}
-\multicolumn{1}{l|}{}                  & \multicolumn{2}{c|}{Prediction RMSE (g)} \\ \hline
-\multicolumn{1}{|c|}{Mass (g)} & PLS + $\Gamma$    & PLS Only   \\ \hline
-\multicolumn{1}{|c|}{~425}           & 2.40              & 75.7         \\
-\multicolumn{1}{|c|}{~650}           & 13.9              & 86.9         \\
-\multicolumn{1}{|c|}{~875}           & 1.40              & 51.1         \\
-\multicolumn{1}{|c|}{1100}           & 15.8              & 40.8         \\
-\multicolumn{1}{|c|}{1325}           & 7.20              & 43.1         \\
-\multicolumn{1}{|c|}{1550}           & 0.20              & 37.2         \\
-\multicolumn{1}{|c|}{1775}           & 9.00              & 147         \\
-\multicolumn{1}{|c|}{2000}           & 11.0              & 7.20         \\ \hline
-\end{tabular}
-\caption{Effect of 5\% $\Gamma$ feature selection on LOOCV block mass prediction root mean squared error (RMSE). Accuracy improves to within 1 measurement unit ($\pm$ 112.5 g) for all tests. Similar results are obtained for surface friction and block compliance predictions.}
-\label{fig:TVR-perf}
-\end{table}
 
 
-%FIGURE 
-\begin{figure}[]
-	%\centering
-    \begin{center}
-    \begin{tabular}{c}
-        \begin{subfigure}[]{0.8\linewidth}
-            \includegraphics[width=\linewidth]{images/tvr_table_p}
-            \caption{Joint-velocities are not selected due to high noise.}
-            \label{fig:tvr_table_p}
-        \end{subfigure}\\
-        \begin{subfigure}[]{0.78\linewidth}
-            \includegraphics[width=\linewidth]{images/tvr_table_h}
-            \caption{Joint-torques, Cartesian-wrench and Hand-tactile selected for providing most task-relevant information to the system.}
-            \label{fig:tvr_table_h}
-        \end{subfigure}
-    \end{tabular}
-    \end{center}
-    \caption{Visualization of features selected according to the task variance ratio, $\Gamma$, of data collected using (a) robot with spherical probe and (b) robot with BarrettHand. Colour is added to signify task-phases. Gaps between task-phases signify an absence of task-relevant information within corresponding time-phases.}
-    \label{fig:tvr_tables}
-\end{figure}
-%ENDFIGURE
 
-%FIGURE 
-\begin{figure}[]
-	\centering
-	\includegraphics[width=\linewidth]{images/beta_reduc_comp}
-	\caption{Effect of varying degrees of PLS dimensionality reduction on mass estimation performance. A 20\% reduction is achievable with trivial loss in estimation quality.}
-	\label{fig:beta_reduc_comp}
-\end{figure}
-%ENDFIGURE
 
-%FIGURE 
-\begin{figure}[]
-	\centering
-	\includegraphics[width=\linewidth]{images/online_m}
-	\caption{Online estimation of the mass from sensory data using varying degrees of dimensionality reduction. 
-    The estimated mass of the block are shown at various blue points throughout the motion. 
-    And the dotted red horizontal line denotes the actual mass of the block. The first row uses all features and no PLS reduction. 
-    The second row uses a reduced set of 5\% selected features without PLS reduction. 
-    The third row uses 5\% selected features, followed by 40\% PLS reduction.
-    Following feature extraction step, the first and last time-phase of the motion are deemed irrelevant to the estimation task.}
-	\label{fig:online}
-\end{figure}
-%ENDFIGURE
-
-%FIGURE 
-\begin{figure}[]
-	\centering
-	\includegraphics[width=\linewidth]{images/online_mfc_vid}
-	\caption{Online estimation of mass, friction and compliance from sensory data following $\Gamma$ feature selection and PLS feature extraction. 
-    Time-phases 1 through 3, 9 and 15 through 18 are ignored since sensor readings during these time-phases do not provide any information with respect to distinguishing environment properties.}
-	\label{fig:online_mfc_vid}
-\end{figure}
-%ENDFIGURE
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
