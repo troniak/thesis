@@ -8,7 +8,7 @@ In this chapter, we provide an overview of the software deployed to control the 
 
 \section{System Overview}
 To support experiments, a sensor processing and robot control framework was written in C++ leveraging the libbarrett API provided by Barrett Technology Inc (Section~\ref{sec:libbarrett}). 
-Our framework was developed exclusively on the internal PC of the WAM robot, the details of which are presented in Table~\ref{tbl:wam_specs}.
+Our framework was developed exclusively on the internal PC of the WAM robot \cite{townsend1993mechanical}, the details of which are presented in Table~\ref{tbl:wam_specs}.
 %For more details on the hardware specifications, please see Appendix~\ref{apx_B}.
 
 \begin{table}[h]
@@ -66,7 +66,7 @@ These datastructures are presented in Table~\ref{tbl:data_types}.
 Control in Cartesian space is a convenient way to prototype motions and is sufficiently repeatable for tasks which require low accuracy.
 Accuracy of the Cartesian positioning of the WAM is advertised at two millimeters.
 In practise, however, this accuracy depends largely on the joint-angle configuration of the WAM at the beginning of the Cartesian-space move.
-In my experiments, position error can easily accumulate to reach as high as one centimeter, depending on the joint-angle position of the robot at the beginning of the Cartesian-space move.
+In our experiments, position error could easily accumulate to reach as high as one centimeter, depending on the joint-angle position of the robot at the beginning of the Cartesian-space move.
 These high errors may be due to imperfect inverse-kinematics currently available through the libbarrett API.
 %Hand-tuned motions are more easily accomplished in Cartesian space when a specific motion within is desired and is effective only if the level of accuracy required is relatively low (0.5~1 cm).
 Cartesian trajectories were not sufficiently repeatable in our experiments since we required a precise and highly repeatable motion (accurate to within 1 mm) to perform our task across various environments.
@@ -90,9 +90,9 @@ The robot can record its trajectory in either Cartesian-space or joint-space.
 Again, due to imperfect inverse-kinematics, if a highly repeatable motion is required it is advisable to record trajectories in joint-space.
 It becomes possible to execute highly repeatable Cartesian-space trajectories if the relative displacement from a known starting joint-angle position is small (i.e. a workspace of approximately $10cm^3$ around a starting joint-angle position).
 
-\section{Barrett-Hand Control}
+\section{BarrettHand Control}
 
-In this section, we introduce the details on control of the BH8-280 Barrett-Hand through the libbarrett API, as used in our experiments.
+In this section, we introduce the details on control of the BH8-280 BarrettHand through the libbarrett API, as used in our experiments.
 
 \paragraph{Velocity Move}
 The simplest form of control of each finger of the Hand is to specify a direction and rate of travel of each of the joints in the Hand.

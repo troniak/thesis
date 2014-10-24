@@ -82,8 +82,8 @@ This dataset is used to learn the predictive model that we now describe.
 
 %%%%DMT%%%%
 %TODO: recap on why feature selection is important (i.e. to reduce amount of data to be streamed from the robot to prediction system)
-%DONE: develop an intuition for $\Gamma$ (look at Pais et al) - a figure demonstrating $\Gamma$ would help here
-%TODO: form (cite?) theoretical basis for why $\Gamma$ works (Pais et al)
+%DONE: develop an intuition for $\Gamma$ (look at Pais et al.) - a figure demonstrating $\Gamma$ would help here
+%TODO: form (cite?) theoretical basis for why $\Gamma$ works (Pais et al.)
 %TODO: propose a strategy for how this will carry over to different tasks
 %TODO: can temporal information be leveraged at all (moving windows, wavelets)?
 %TODO: take out classification and stick with regression throughout
@@ -92,15 +92,35 @@ This dataset is used to learn the predictive model that we now describe.
 
 %%% the predictive model
 
-Given a new sensory stream, $\mathbf{x}_{new}$, which consists of $n_t$ samples of $\mathbf{s}$, we wish to predict the environment properties $\mathbf{y}$.
-We develop a two-stage solution that consists of 
-(i) selecting the most {\em relevant} input features from $\mathbf{x}$, and 
-(ii) using partial least squares (PLS) to further learn a more compact latent linear subspace that is well suited to predicting environment properties.
-%%%%%
-%%DMT modified for simplicity 
-%As we will show in the results, PLS property predictions without the initial feature selection step are not always sufficiently accurate.
-%, despite its ability to exploit correlations between inputs and between inputs and outputs.
-%%%%%
+%Given a new sensory stream, $\mathbf{x}_{new}$, which consists of $n_t$ samples of $\mathbf{s}$, we wish to predict the environment properties $\mathbf{y}$.
+%We develop a two-stage solution that consists of 
+%(i) selecting the most {\em relevant} input features from $\mathbf{x}$, and 
+%(ii) using partial least squares (PLS) to further learn a more compact latent linear subspace that is well suited to predicting environment properties.
+%%%%%%
+%%%DMT modified for simplicity 
+%%As we will show in the results, PLS property predictions without the initial feature selection step are not always sufficiently accurate.
+%%, despite its ability to exploit correlations between inputs and between inputs and outputs.
+%%%%%%
+%We now discuss these two stages in further detail.
+
+Given a new sensory stream, $\mathbf{x}_{new}$, which consists of $n_t$ samples of $\mathbf{s}$, we
+wish to predict the environment properties $\mathbf{y}$.  
+For our work, the prediction task is characterized by having a small number of observations, $p=    144$, and a large number features to use for the prediction, $n=1650$\footnote{Note that our        notation for $p$ and $n$ is the reverse of that used in the statistics literature, where $n$        commonly represents the number of samples, and $p$ represents the number of predictors, i.e., the   feature count.}.  
+Furthermore, many of the features are likely to be highly correlated.  These characteristics are    problematic for many common regression methods. 
+In contrast, PLS is a good alternative for such problems~\cite{Friedman2001}. 
+In particular, it couples the dimension reduction and the regression model, making the dimension    reduction dependent on the input, $\mathbf{X}$, {\em and} the output, $\mathbf{Y}$.  While PLS is a popular tool in the biological sciences and elsewhere, its use in the context of robotic sensing    remains rare.
+
+An important remaining challenge with PLS, however, is that while it provides a principled          estimation method, the method itself is not tailored for variable or feature                        selection~\cite{chun2010sparse}. Relatedly, it can be shown that the PLS estimator does not         guarantee statistically-consistent predictions for problems like ours with a high feature-count to  sample-count ratio, and that noise variables act to attenuate the predictions of the regression     parameters~\cite{chun2010sparse}. 
+We specifically address this by imposing an aggressive feature selection method before applying PLS.
+In our results, we demonstrate this to be highly effective in helping to achieve improved           prediction performance.
+We note that other methods have also been recently proposed to address the limitations of PLS, such as imposing sparsity in the dimension reduction step of PLS~\cite{chun2010sparse} or Supervised     Principle Components~\cite{bair2006prediction}.
+As currently developed, these alternative methods are motivated-by and tested on gene expression    problems.
+
+% reduced PLS:
+% - impose sparsity on final PLS estimates: Huang et al 2004
+% - impose sparsity on the dimension reduction step of PLS
+
+With the above motivation in mind, our two-stage solution consists of (i) selecting the most {\em   relevant} input features from $\mathbf{x}$, and (ii) using PLS to further learn a compact latent    linear subspace that is well suited to predicting environment properties.
 We now discuss these two stages in further detail.
 
 \subsection{Feature Selection via the Task Variance Ratio}
@@ -238,8 +258,8 @@ Finally, we use $\beta$ at runtime to predict environment properties:
   \begin{equation} \mathbf{\hat{y}} = \mathbf{\beta} \cdot \mathbf{x^*_{new}} \end{equation}
 where $\mathbf{x^*_{new}}$ represents the reduced version (i.e. following $\Gamma$ feature selection) of a new unlabeled sensory data stream collected during a repetition of the motion in an unknown environment.
 
-Data from multimodal data streams are likely to be highly correlated, e.g. Cartesian force experienced by the hand and tactile pressure readings at the fingertips.
-In addition, there is likely to be significant correlation between sensor readings over time.
-Lastly, there are correlations between the input dimensions and output dimensions.
-The existance of these correlations are ideal in the application of the PLS regression method \cite{Tobias1995}.
+%Data from multimodal data streams are likely to be highly correlated, e.g. Cartesian force experienced by the hand and tactile pressure readings at the fingertips.
+%In addition, there is likely to be significant correlation between sensor readings over time.
+%Lastly, there are correlations between the input dimensions and output dimensions.
+%The existence of these correlations are ideal in the application of the PLS regression method \cite{Tobias1995}.
 %--------------------------------------------------------------------------------------------------------------

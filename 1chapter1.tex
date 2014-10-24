@@ -45,7 +45,7 @@ This makes making predictions susceptible to Bellman's infamous curse of dimensi
 We therefore take steps to reduce the number of sensors considered when predicting properties of an environment.
 
 To test our solution, we consider a block topple-slide task (see Figure~\ref{fig:topple}) performed by a robot equipped with force, torque and tactile sensors.
-In this task, the end effector of the robot pushes on the side of a foam-encapsulated block, causing it to topple, and then pushes the block back to its starting pose against a wall.
+In this task, the end effector of the robot pushes on the side of a foam-encapsulated block, causing it to topple, and then pushes the block back to its starting configuration against a wall.
 A prescribed joint-angle trajectory to achieve this manipulation task is provided by a human expert through kinesthetic teaching.
 %The robot tracks the given trajectory in joint space using a standard computed-torque tracking procedure.
 The given example trajectory is assumed to be robust in two ways: repeating the trajectory should cause repeated rotations of the block, and the same trajectory should remain successful when applied to blocks with variations in mass, friction, and compliance. 
@@ -98,14 +98,14 @@ The contributions of this thesis are three-fold:
 
 The feature selection algorithm allows the robot to distinguish between sensors which provide task-critical information, and sensors which provide information that is noisy or irrelevant to the task.
 This ability to gauge the usefulness of sensor readings becomes important as the number of sensors in the system increases, and real-time processing of all sensors becomes impossible.
-Disregarding all but the most important sensors reduces algorithmic complexity to constant time, which guarantees support for real-time operation irregardless of the number of sensors physically available to the robot.
+Disregarding all but the most important sensors reduces algorithmic complexity to constant time, which guarantees support for real-time operation irrespective of the number of sensors physically available to the robot.
 The developed models are then used to efficiently predict environment properties when novel sensory data traces are recorded by the robot's sensors.
 
 %%%%%%%%%%%%%%%%%%
 
 \section{Thesis Structure}
-Following this introductory chapter, we provide background literature on the topic of exploiting force and tactile sensor data for manipulation in the robotics, neuroscience and physiology literature in Chapter~\ref{chap2}.
-In Chapter~\ref{chap3}, we more formally define the algorithms and data structures used in our approach.
-Chapter~\ref{chap4} contains an overview of the software developed in support of experiments.
-In Chapter~\ref{chap5}, we present experimental procedures and results of experiments with the physical robotic system.
-Finally, conclusions are drawn in Chapter~\ref{chap6}.
+Following this introductory chapter, in Chapter~\ref{chap2} we provide some background on the topic of exploiting force and tactile sensors in support of physical manipulation, as presented in a sample of the literature from the robotics, neuroscience and physiology research communities.
+In Chapter~\ref{chap3}, we more formally define the problem we wish to solve in this thesis and define the algorithms and data structures used in our approach.
+Chapter~\ref{chap4} serves as an overview to the robot control software developed to support experiments.
+In Chapter~\ref{chap5}, we present details on experiments conducted to test the effectiveness of our approach on a physical robotic system, along with results of said experiments.
+Finally, conclusions are drawn and future work is provided in Chapter~\ref{chap6}.
